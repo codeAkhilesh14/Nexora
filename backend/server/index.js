@@ -1,4 +1,7 @@
+import dns from 'node:dns';
 import http from 'node:http';
+
+dns.setDefaultResultOrder('ipv4first');
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
