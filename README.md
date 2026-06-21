@@ -9,7 +9,7 @@ By blending anonymous-first interactions with progressive reveal mechanics, Nexo
 
 ### 1. Domain-Gated Authentication & Verification
 - **Verified Signup:** Gatekeep registration through verified campus-specific email domains (e.g., `student@iitd.ac.in`).
-- **Nodemailer OTP:** Realtime email verification via SMTP (with fallback to local testing inputs).
+- **Resend OTP:** Realtime email verification using Resend email service.
 - **Secure Sessions:** Dual JWT architecture using secure HTTP-only cookies and token rotation mechanisms.
 - **Onboarding Journey:** Interactive multi-step onboarding path to customize nickname, select avatar, vibe tags, prompts, music taste, and study/relationship interests.
 
@@ -70,7 +70,7 @@ By blending anonymous-first interactions with progressive reveal mechanics, Nexo
 - **Database:** MongoDB Atlas, Mongoose (Index optimization, TTL hooks)
 - **Realtime communications:** Socket.IO
 - **AI Engine:** DeepSeek (via OpenRouter compatibility) with deterministic backup algorithms
-- **Integrations:** Razorpay checkout & webhooks, Cloudinary image upload, Nodemailer SMTP
+- **Integrations:** Razorpay checkout & webhooks, Cloudinary image upload, Resend email service
 - **Security:** Helmet, CORS, Express rate limit, bcryptjs password hashing
 
 ---
@@ -131,12 +131,8 @@ JWT_REFRESH_SECRET=your_refresh_secret_key
 FRONTEND_URL=http://localhost:5173
 ADMIN_EMAIL=admin@nexora.in
 
-# Email OTP Settings
-SMTP_HOST=smtp.mailtrap.io
-SMTP_PORT=2525
-SMTP_USER=your_smtp_user
-SMTP_PASS=your_smtp_password
-MAIL_FROM="Nexora <noreply@nexora.in>"
+# Email OTP Settings (Resend)
+RESEND_API_KEY=your_resend_api_key
 
 # AI and Cloudinary Settings (Optional)
 OPENROUTER_API_KEY=your_openrouter_key

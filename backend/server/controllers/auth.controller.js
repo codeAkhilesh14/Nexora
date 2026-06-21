@@ -90,7 +90,7 @@ export const signup = asyncHandler(async (req, res) => {
 
   // Link newly signed up user to any existing secret crushes
   await Crush.updateMany({ targetEmail: email?.toLowerCase() }, { targetUser: user._id });
-  
+
   // Send OTP to email - will throw error if SMTP not configured
   let otpSent = false;
   try {
@@ -100,7 +100,7 @@ export const signup = asyncHandler(async (req, res) => {
     console.error('[Auth] OTP Email send failed for:', email, emailError.message);
     throw new ApiError(500, 'Unable to send verification email. Please check email configuration.');
   }
-  
+
   const tokens = setAuthCookies(res, user);
   ok(res, {
     user: publicUser(await user.populate('college')),
@@ -118,7 +118,7 @@ export const resendOtp = asyncHandler(async (req, res) => {
   const otp = createOtp();
   user.otp = { hash: hashToken(otp), expiresAt: new Date(Date.now() + 10 * 60 * 1000) };
   await user.save();
-  
+
   // Send OTP to email - will throw error if SMTP not configured
   try {
     await sendOtpEmail(email, otp);
