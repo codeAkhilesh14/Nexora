@@ -67,5 +67,5 @@ app.use(errorHandler);
 await connectDB();
 await syncCollegeCatalog();
 server.listen(env.port, () => {
-  console.log(`Nexora API listening on ${env.port}`);
+  console.log('Server is running on port no 8080');
 });
