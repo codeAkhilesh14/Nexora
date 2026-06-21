@@ -693,7 +693,7 @@ export const RoomsPage = () => {
               className="group"
             >
               <Card 
-                tilt={true}
+                tilt={false}
                 className="h-full flex flex-col justify-between overflow-hidden bg-white dark:bg-[#111318] transition-all duration-300 border-none shadow-md hover:shadow-lg"
               >
                 {/* Custom glowing background gradient based on mood */}
