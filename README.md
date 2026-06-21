@@ -63,7 +63,18 @@ graph LR
 ```
 
 ---
+<img width="1880" height="910" alt="{B0EE258E-3548-46FC-95F3-A9CBC4D21AAB}" src="https://github.com/user-attachments/assets/23f81504-cb71-4351-a43c-671919269189" />
 
+<img width="1884" height="904" alt="{84D7C08A-EBA0-4049-A2CD-F36DCCB8A8AB}" src="https://github.com/user-attachments/assets/7d88692f-54c5-45f5-822a-14fc17c4e563" />
+
+<img width="1874" height="905" alt="{E0827AFE-0947-4440-9753-48F2B2B9E194}" src="https://github.com/user-attachments/assets/36292a3a-8a7f-4773-a67e-4fb168a52619" />
+
+<img width="1879" height="900" alt="{B36BFFB1-C8C1-475E-B86F-0984E2C82416}" src="https://github.com/user-attachments/assets/51ce8385-0dd4-4d8e-9e5e-898962f15570" />
+
+<img width="1875" height="896" alt="{3DD76311-2C08-4A5D-A7B3-C540B74C9403}" src="https://github.com/user-attachments/assets/fafa4600-9b07-41d5-9aae-b2f1ad5685b3" />
+
+
+---
 ## 🌟 Key Features & Technical Details
 
 ### 1. Domain-Gated Authentication & Verification
