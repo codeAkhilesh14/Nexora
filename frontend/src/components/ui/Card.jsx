@@ -29,7 +29,7 @@ export const Card = ({ className, children, tilt = true, style, ...props }) => {
   };
 
   const handleMouseEnter = () => {
-    if (tilt) setIsHovered(true);
+    setIsHovered(true);
   };
 
   const handleMouseLeave = () => {
@@ -37,15 +37,13 @@ export const Card = ({ className, children, tilt = true, style, ...props }) => {
     setRotation({ x: 0, y: 0 });
   };
 
-  const transformStyle = tilt
-    ? {
-        transform: isHovered 
-          ? `perspective(1000px) rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) translateY(-4px)`
-          : 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)',
-        transition: isHovered ? 'transform 0.08s ease-out' : 'transform 0.5s ease-out',
-        transformStyle: 'preserve-3d',
-      }
-    : {};
+  const transformStyle = {
+    transform: isHovered 
+      ? `perspective(1000px) ${tilt ? `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)` : ''} translateZ(20px) scale(1.01) translateY(-4px)`
+      : `perspective(1000px) ${tilt ? 'rotateX(0deg) rotateY(0deg)' : ''} translateZ(0px) scale(1) translateY(0px)`,
+    transition: isHovered ? 'transform 0.15s ease-out' : 'transform 0.4s ease-out',
+    transformStyle: 'preserve-3d',
+  };
 
   return (
     <div

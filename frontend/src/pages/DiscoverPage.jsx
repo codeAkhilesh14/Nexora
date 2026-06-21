@@ -113,7 +113,6 @@ const ProfileCard = forwardRef(({ profile, online, onAction, actionPending, inde
       ref.current = node;
     }
   };
-  const [rotation, setRotation] = useState({ x: 0, y: 0 });
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
   const [isHovered, setIsHovered] = useState(false);
 
@@ -125,13 +124,6 @@ const ProfileCard = forwardRef(({ profile, online, onAction, actionPending, inde
     const xVal = e.clientX - rect.left;
     const yVal = e.clientY - rect.top;
 
-    const x = xVal - rect.width / 2;
-    const y = yVal - rect.height / 2;
-
-    const rx = -(y / (rect.height / 2)) * 4.5;
-    const ry = (x / (rect.width / 2)) * 4.5;
-
-    setRotation({ x: rx, y: ry });
     setMousePos({
       x: (xVal / rect.width) * 100,
       y: (yVal / rect.height) * 100,
@@ -144,7 +136,6 @@ const ProfileCard = forwardRef(({ profile, online, onAction, actionPending, inde
 
   const handleMouseLeave = () => {
     setIsHovered(false);
-    setRotation({ x: 0, y: 0 });
   };
 
   return (
@@ -158,9 +149,8 @@ const ProfileCard = forwardRef(({ profile, online, onAction, actionPending, inde
       animate={{
         opacity: 1,
         y: isHovered ? -4 : 0,
-        scale: 1,
-        rotateX: rotation.x,
-        rotateY: rotation.y,
+        scale: isHovered ? 1.01 : 1,
+        z: isHovered ? 20 : 0,
       }}
       exit={{ opacity: 0, scale: 0.9, y: -10, transition: { duration: 0.2 } }}
       transition={{

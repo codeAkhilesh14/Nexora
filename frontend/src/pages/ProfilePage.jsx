@@ -329,7 +329,7 @@ export const ProfilePage = () => {
   const randomizeAvatar = () => setAvatarPreview(createAvatar(Date.now() + Math.floor(Math.random() * 1000)));
   return (
     <div className="mx-auto max-w-2xl px-4 sm:px-0">
-      <Card>
+      <Card tilt={false}>
         <div className="flex items-center gap-3">
           <div className="relative grid h-10 w-10 sm:h-12 sm:w-12 place-items-center overflow-hidden rounded-lg bg-aurora font-black text-ink text-sm sm:text-base">
             {avatarPreview ? <img className="h-full w-full object-cover" src={avatarPreview} alt="" /> : user?.nickname?.[0] || 'N'}

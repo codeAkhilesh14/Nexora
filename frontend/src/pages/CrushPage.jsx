@@ -120,6 +120,7 @@ export const CrushPage = () => {
                   className="h-full"
                 >
                   <Card 
+                    tilt={false}
                     className={`h-full flex flex-col justify-between p-6 relative overflow-hidden transition-all duration-300 ${
                       hasMutualMatch 
                         ? 'border-rose-500/40 dark:border-rose-500/30 bg-gradient-to-br from-rose-500/10 via-pink-500/5 to-slate-900/60 dark:from-rose-950/20 dark:via-pink-950/10 dark:to-slate-950/60 shadow-[0_0_25px_rgba(244,63,94,0.15)]' 

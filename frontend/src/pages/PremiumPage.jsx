@@ -201,7 +201,10 @@ export const PremiumPage = () => {
                   Most Popular
                 </div>
               )}
-              <Card className={`h-full flex flex-col justify-between overflow-hidden relative border transition-all duration-300 ${isPopular ? 'border-aurora/40 dark:border-aurora/30 shadow-glow bg-gradient-to-b from-white to-aurora/5 dark:from-ink dark:to-aurora/5' : 'border-black/5 dark:border-white/5 bg-white dark:bg-ink'}`}>
+              <Card 
+                tilt={false}
+                className={`h-full flex flex-col justify-between overflow-hidden relative border transition-all duration-300 ${isPopular ? 'border-aurora/40 dark:border-aurora/30 shadow-glow bg-gradient-to-b from-white to-aurora/5 dark:from-ink dark:to-aurora/5' : 'border-black/5 dark:border-white/5 bg-white dark:bg-ink'}`}
+              >
                 
                 {isPopular && (
                   <motion.div

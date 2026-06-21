@@ -112,7 +112,7 @@ export const LikesRequestsPage = () => {
                     exit={{ opacity: 0, scale: 0.9, x: -30, transition: { duration: 0.2 } }}
                     transition={{ type: 'spring', stiffness: 220, damping: 20 }}
                   >
-                    <Card className={`transition-all duration-300 ${cardBorderClass}`}>
+                    <Card tilt={false} className={`transition-all duration-300 ${cardBorderClass}`}>
                       <div className="flex items-center gap-4">
                         <div className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-2xl bg-aurora text-2xl font-black text-ink">
                           {request.from?.avatar ? (
