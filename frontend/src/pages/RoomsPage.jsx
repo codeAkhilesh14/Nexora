@@ -474,7 +474,7 @@ export const RoomsPage = () => {
 
     return (
       <div className="w-full max-w-2xl mx-auto flex flex-col h-[calc(100vh-172px)] h-[calc(100dvh-172px)] sm:h-[calc(100vh-200px)] pt-3 sm:pt-6">
-        <div className={`flex flex-col flex-1 bg-white dark:bg-[#111318] rounded-2xl shadow-xl overflow-hidden border ${theme.cardClass} relative`}>
+        <div className={`flex flex-col flex-1 bg-white dark:bg-[#111318] rounded-2xl shadow-xl overflow-hidden border chatting-card-element ${theme.cardClass} relative`}>
           {/* Custom glowing background gradient based on mood */}
           <div className={`absolute inset-0 bg-gradient-to-br ${theme.bg} opacity-40 pointer-events-none`} />
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-slate-200/10 dark:from-white/[0.02] to-transparent rounded-bl-full pointer-events-none" />

@@ -257,4 +257,11 @@ option {
   }
 }
 
+/* Chatting card margin adjustment for mobile viewports (specifically around 393px x 851px-873px) */
+@media (max-width: 480px) {
+  body.chatting-active .chatting-card-element {
+    margin: 8px 12px 14px 12px !important;
+  }
+}
+
 

@@ -196,7 +196,7 @@ export const ChatsPage = () => {
         </div>
       </Card>
 
-      <Card tilt={false} className={`flex-1 lg:flex-initial min-h-0 flex-col p-0 ${active ? 'flex' : 'hidden lg:flex'}`}>
+      <Card tilt={false} className={`flex-1 lg:flex-initial min-h-0 flex-col p-0 chatting-card-element ${active ? 'flex' : 'hidden lg:flex'}`}>
         <div className="flex items-center justify-between border-b border-black/10 p-2 sm:p-4 dark:border-white/10">
           <div className="min-w-0 flex items-center gap-1.5 sm:gap-3 flex-1">
             {active && (
