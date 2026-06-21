@@ -262,14 +262,14 @@ option {
   }
 
   body.chatting-active .chatting-page-container {
-    height: calc(100dvh - 142px) !important;
+    height: calc(100dvh - 128px) !important;
   }
 }
 
 /* Chatting card margin adjustment for mobile viewports (specifically around 393px x 851px-873px) */
 @media (max-width: 480px) {
   body.chatting-active .chatting-card-element {
-    margin: 4px 12px 12px 12px !important;
+    margin: 4px 6px 6px 6px !important;
   }
 }
 
