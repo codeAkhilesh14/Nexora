@@ -99,10 +99,19 @@ const ProfileCard = forwardRef(({ profile, online, onAction, actionPending, inde
   const glow = glowColors[index % glowColors.length];
 
   const premiumStyles = getPremiumStyles(profile.premium);
+  const isHighMatch = profile.matchPercentage > 75;
+
   const cardBorderClass = premiumStyles
     ? premiumStyles.cardClass
-    : `border border-slate-200/50 dark:border-white/[0.08] shadow-[0_12px_40px_-12px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_-20px_rgba(0,0,0,0.7)] ${glow} hover:border-slate-300/60 dark:hover:border-white/[0.12]`;
-  const bgGradient = premiumStyles ? premiumStyles.gradient : gradient;
+    : (isHighMatch
+        ? `border-2 border-pink-400/50 dark:border-pink-500/40 shadow-[0_12px_40px_-12px_rgba(244,63,94,0.15)] dark:shadow-[0_20px_50px_-20px_rgba(244,63,94,0.3)] hover:scale-[1.01] hover:border-pink-500 dark:hover:border-pink-400 hover:shadow-2xl dark:bg-[#181113]`
+        : `border border-slate-200/50 dark:border-white/[0.08] shadow-[0_12px_40px_-12px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_-20px_rgba(0,0,0,0.7)] ${glow} hover:border-slate-300/60 dark:hover:border-white/[0.12]`);
+
+  const bgGradient = premiumStyles
+    ? premiumStyles.gradient
+    : (isHighMatch
+        ? 'from-pink-500/10 via-rose-500/5 to-transparent dark:from-pink-600/25 dark:via-rose-500/10 dark:to-transparent'
+        : gradient);
 
   const localRef = useRef(null);
   const setRefs = (node) => {
@@ -176,6 +185,13 @@ const ProfileCard = forwardRef(({ profile, online, onAction, actionPending, inde
       {/* Animated gradient bg */}
       <div className={`absolute inset-0 bg-gradient-to-br ${bgGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-700`} />
       <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-slate-200/10 dark:from-white/[0.03] to-transparent rounded-bl-full" />
+      {isHighMatch && (
+        <div className="absolute top-3 right-3 z-20">
+          <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white px-2 py-0.5 text-[8px] font-black uppercase tracking-wider shadow-md animate-pulse">
+            🔥 High Match
+          </span>
+        </div>
+      )}
 
       <div style={{ transform: 'translateZ(15px)' }} className="relative z-10 p-4 sm:p-6">
         {/* Header: Avatar + Info */}
@@ -221,7 +237,7 @@ const ProfileCard = forwardRef(({ profile, online, onAction, actionPending, inde
             <p className="mt-0.5 text-[11px] sm:text-xs font-semibold text-slate-500 dark:text-white/45 truncate">
               {profile.branch?.toUpperCase()}{userIsPremium && ` · Year ${profile.year}`}{profile.gender && (profile.gender === 'man' ? ' · M' : profile.gender === 'woman' ? ' · F' : '')}
             </p>
-            <div className="mt-2 flex items-center gap-2">
+            <div className="mt-2 flex flex-wrap items-center gap-2">
               <span className={`inline-flex items-center gap-1 rounded-full px-2 py-[2px] text-[10px] font-bold ${profileOnline
                   ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
                   : 'bg-slate-100 dark:bg-white/[0.04] text-slate-500 dark:text-white/40 border border-slate-200/60 dark:border-white/[0.06]'
@@ -232,6 +248,11 @@ const ProfileCard = forwardRef(({ profile, online, onAction, actionPending, inde
               <span className="rounded-full bg-indigo-500/10 dark:bg-indigo-500/10 border border-indigo-500/20 dark:border-indigo-500/30 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-300">
                 L{profile.revealLevel}
               </span>
+              {profile.matchPercentage != null && (
+                <span className="rounded-full bg-pink-500/10 dark:bg-pink-500/10 border border-pink-500/20 dark:border-pink-500/30 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-pink-600 dark:text-pink-400 flex items-center gap-0.5 shadow-sm">
+                  <span>💖</span> {profile.matchPercentage}% Match
+                </span>
+              )}
             </div>
           </div>
         </div>

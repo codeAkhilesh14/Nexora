@@ -9,6 +9,55 @@ import { ok } from '../utils/ApiResponse.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
 const anonymousProjection = 'nickname avatar branch year gender interests vibeTags musicTaste prompts relationshipGoals premium revealLevel';
+
+const getProfileWords = (user) => {
+  const words = [];
+  
+  const addText = (text) => {
+    if (!text) return;
+    const cleanText = text.toString().toLowerCase().replace(/[^\w\s-]/g, ' ');
+    const parts = cleanText.split(/\s+/).filter(Boolean);
+    words.push(...parts);
+  };
+
+  addText(user.bio);
+  addText(user.branch);
+  
+  (user.interests || []).forEach(item => addText(item));
+  (user.vibeTags || []).forEach(item => addText(item));
+  (user.musicTaste || []).forEach(item => addText(item));
+  (user.studyInterests || []).forEach(item => addText(item));
+  (user.relationshipGoals || []).forEach(item => addText(item));
+
+  (user.prompts || []).forEach(prompt => {
+    addText(prompt.question);
+    addText(prompt.answer);
+  });
+
+  const stopWords = new Set(['i', 'am', 'a', 'the', 'and', 'to', 'in', 'is', 'of', 'for', 'on', 'with', 'at', 'my', 'me', 'you', 'he', 'she', 'they', 'it', 'was', 'were', 'or', 'this', 'that', 'your']);
+  const filteredWords = words.filter(w => !stopWords.has(w) && w.length > 1);
+  return new Set(filteredWords);
+};
+
+export const calculateMatchPercentage = (user1, user2) => {
+  const words1 = getProfileWords(user1);
+  const words2 = getProfileWords(user2);
+
+  const hash = (parseInt(user1._id.toString().slice(-4), 16) || 0) + (parseInt(user2._id.toString().slice(-4), 16) || 0);
+  const baseMatch = 30 + (hash % 10); // Base is 30%-39%
+
+  if (words1.size === 0 || words2.size === 0) {
+    return baseMatch;
+  }
+
+  const intersection = new Set([...words1].filter(w => words2.has(w)));
+  const union = new Set([...words1, ...words2]);
+  
+  const jaccard = union.size > 0 ? intersection.size / union.size : 0;
+
+  const finalPercentage = Math.round(baseMatch + (jaccard * (99 - baseMatch)));
+  return finalPercentage;
+};
 const matchedProjection = `${anonymousProjection} realPhoto realPhotoVisibleToMatches`;
 const SWIPE_LIMITS = { pulse_pro: 20, orbit_z: 30, nebula_x: Infinity, spark: 20, plus: 30, max: Infinity };
 const FREE_SWIPE_LIMIT = 5;
@@ -113,7 +162,7 @@ export const getDeck = asyncHandler(async (req, res) => {
     ...chatParticipants.map((id) => id.toString())
   ];
 
-  const users = await User.find({
+  const usersData = await User.find({
     _id: {
       $nin: [
         req.user._id,
@@ -126,7 +175,13 @@ export const getDeck = asyncHandler(async (req, res) => {
     status: 'active'
   })
     .select(anonymousProjection)
-    .sort({ 'premium.active': -1, updatedAt: -1 });
+    .sort({ 'premium.active': -1, updatedAt: -1 })
+    .lean();
+
+  const users = usersData.map(u => ({
+    ...u,
+    matchPercentage: calculateMatchPercentage(req.user, u)
+  }));
   ok(res, { users });
 });
 
@@ -231,7 +286,7 @@ export const getRadarZoneUsers = asyncHandler(async (req, res) => {
     ...chatUserIds.map((id) => id.toString())
   ]);
 
-  const users = await User.find({
+  const usersData = await User.find({
     _id: {
       $nin: [req.user._id, ...blocked, ...[...excludedUserIds].filter((id) => id !== req.user._id.toString())]
     },
@@ -241,7 +296,13 @@ export const getRadarZoneUsers = asyncHandler(async (req, res) => {
   })
     .select(anonymousProjection)
     .sort({ 'premium.active': -1, updatedAt: -1 })
-    .limit(Number(req.query.limit || 20));
+    .limit(Number(req.query.limit || 20))
+    .lean();
+
+  const users = usersData.map(u => ({
+    ...u,
+    matchPercentage: calculateMatchPercentage(req.user, u)
+  }));
   ok(res, { users, zone, label: radarZoneLabels[zone] || zone.replace('_', ' ') });
 });
 
