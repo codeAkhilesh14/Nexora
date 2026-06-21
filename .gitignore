@@ -1,3 +1,13 @@
-# API Keys & Secrets
+# Environment variables files
 backend/.env
 frontend/.env
+
+# Dependencies
+node_modules/
+
+# Build files
+dist/
+build/
+
+# Logs
+*.log
