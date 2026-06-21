@@ -612,7 +612,7 @@ export const DiscoverPage = () => {
           {/* Mobile Radar & Ladder (above search) */}
           <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:hidden">
             {renderQuickRadar()}
-            {renderRevealLadder()}
+            {!showZoneDeck && renderRevealLadder()}
           </div>
 
           {/* Search */}
@@ -666,7 +666,7 @@ export const DiscoverPage = () => {
       </section>
 
       <aside className="hidden xl:block space-y-4">
-        {renderRevealLadder()}
+        {!showZoneDeck && renderRevealLadder()}
         {renderQuickRadar()}
       </aside>
     </div>

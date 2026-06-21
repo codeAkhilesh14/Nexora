@@ -123,7 +123,6 @@ export const getDeck = asyncHandler(async (req, res) => {
         ...matchedUserIds
       ]
     },
-    college: req.user.college._id,
     status: 'active'
   })
     .select(anonymousProjection)
@@ -148,7 +147,7 @@ export const swipe = asyncHandler(async (req, res) => {
   if (swipeLimit !== Infinity && req.user.limits.swipesToday >= swipeLimit) {
     throw new ApiError(429, `Daily swipe limit reached (${swipeLimit}). Upgrade to Premium for more.`);
   }
-  const target = await User.findOne({ _id: targetUserId, college: req.user.college._id, status: 'active' });
+  const target = await User.findOne({ _id: targetUserId, status: 'active' });
   if (!target) throw new ApiError(404, 'Campus profile not found');
   const result = await handleSwipe({ from: req.user, to: target, action, io: req.app.get('io') });
   req.user.limits.swipesToday += 1;
@@ -203,7 +202,6 @@ export const updateRadar = asyncHandler(async (req, res) => {
         ...[...excludedUserIds].filter((id) => id !== req.user._id.toString())
       ]
     },
-    college: req.user.college._id,
     status: 'active',
     'locationSignal.zone': zone,
     'locationSignal.updatedAt': { $gte: new Date(Date.now() - 6 * 60 * 60 * 1000) }
@@ -237,7 +235,6 @@ export const getRadarZoneUsers = asyncHandler(async (req, res) => {
     _id: {
       $nin: [req.user._id, ...blocked, ...[...excludedUserIds].filter((id) => id !== req.user._id.toString())]
     },
-    college: req.user.college._id,
     status: 'active',
     'locationSignal.zone': zone,
     'locationSignal.updatedAt': { $gte: new Date(Date.now() - 6 * 60 * 60 * 1000) }
