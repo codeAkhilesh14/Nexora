@@ -57,7 +57,8 @@ export const collegeCatalog = [
   ['Dronacharya College of Engineering', 'DCE', ['dronacharya.info']],
   ['KIET Group of Institutions', 'KIET', ['kiet.edu']],
   ['IMS Engineering College', 'IMSEC', ['imsec.ac.in']],
-  ['RKGIT', 'RKGIT', ['rkgit.edu.in']]
+  ['RKGIT', 'RKGIT', ['rkgit.edu.in']],
+  ['Birla Institute of Technology Mesra', 'BITMESRA', ['bitmesra.ac.in']]
 ];
 
 export const syncCollegeCatalog = async () => Promise.all(

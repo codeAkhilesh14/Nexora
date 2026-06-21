@@ -87,6 +87,7 @@ graph LR
 
 ### 2. Campus Discover & Compatibility Matching
 - **Swipe-Deck Cards:** Rich, interactive swipe cards showing vibe tags, prompts, interest metrics, and online/offline status.
+- **College Isolation:** Discovery is strictly restricted to students from the user's verified college to guarantee complete campus privacy.
 - **Bag-of-Words Jaccard Similarity:** Profile compatibility matches are processed in [discovery.controller.js](file:///d:/Nexora/backend/server/controllers/discovery.controller.js) using text extraction from bio, branch, tags, prompts, and tastes. It tokenizes words, filters out stop-words, and calculates similarity:
   $$\text{Jaccard Similarity} = \frac{|A \cap B|}{|A \cup B|}$$
   Scores dynamically scale between 30% and 99% (profiles with no matching keywords receive a randomized baseline of 30%–39%).

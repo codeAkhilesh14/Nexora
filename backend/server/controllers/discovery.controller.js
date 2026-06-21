@@ -172,7 +172,8 @@ export const getDeck = asyncHandler(async (req, res) => {
         ...matchedUserIds
       ]
     },
-    status: 'active'
+    status: 'active',
+    college: req.user.college._id || req.user.college
   })
     .select(anonymousProjection)
     .sort({ 'premium.active': -1, updatedAt: -1 })
@@ -258,6 +259,7 @@ export const updateRadar = asyncHandler(async (req, res) => {
       ]
     },
     status: 'active',
+    college: req.user.college._id || req.user.college,
     'locationSignal.zone': zone,
     'locationSignal.updatedAt': { $gte: new Date(Date.now() - 6 * 60 * 60 * 1000) }
   });
@@ -291,6 +293,7 @@ export const getRadarZoneUsers = asyncHandler(async (req, res) => {
       $nin: [req.user._id, ...blocked, ...[...excludedUserIds].filter((id) => id !== req.user._id.toString())]
     },
     status: 'active',
+    college: req.user.college._id || req.user.college,
     'locationSignal.zone': zone,
     'locationSignal.updatedAt': { $gte: new Date(Date.now() - 6 * 60 * 60 * 1000) }
   })
