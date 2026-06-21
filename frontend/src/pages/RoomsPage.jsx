@@ -401,6 +401,20 @@ export const RoomsPage = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  useEffect(() => {
+    if (activeRoom) {
+      document.body.classList.add('chatting-active');
+      document.documentElement.classList.add('chatting-active');
+    } else {
+      document.body.classList.remove('chatting-active');
+      document.documentElement.classList.remove('chatting-active');
+    }
+    return () => {
+      document.body.classList.remove('chatting-active');
+      document.documentElement.classList.remove('chatting-active');
+    };
+  }, [activeRoom]);
+
   const handleEnterRoom = (room) => {
     if (room.joined) {
       setActiveRoom(room);

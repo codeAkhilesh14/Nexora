@@ -128,6 +128,15 @@ export const ChatsPage = () => {
     return () => socket?.off('message:new');
   }, [chatId, qc]);
 
+  useEffect(() => {
+    document.body.classList.add('chatting-active');
+    document.documentElement.classList.add('chatting-active');
+    return () => {
+      document.body.classList.remove('chatting-active');
+      document.documentElement.classList.remove('chatting-active');
+    };
+  }, []);
+
   const inputDisabled = !chatId || limitReached || isBlockedByMe || isBlockedByPeer;
   const getPlaceholderText = () => {
     if (limitReached) return 'Daily limit reached — upgrade for more';
