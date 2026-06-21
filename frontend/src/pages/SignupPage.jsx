@@ -4,7 +4,8 @@ import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
 import { http } from '../api/http.js';
 import { Button } from '../components/ui/Button.jsx';
 import { Input } from '../components/ui/Input.jsx';
@@ -55,7 +56,28 @@ export const SignupPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const token = useSelector((state) => state.auth.accessToken);
-  const { register, handleSubmit, formState: { isSubmitting, errors } } = useForm({ resolver: zodResolver(schema), defaultValues: { gender: 'prefer_not', year: 1 } });
+  const { register, handleSubmit, setValue, watch, formState: { isSubmitting, errors } } = useForm({ resolver: zodResolver(schema), defaultValues: { gender: 'prefer_not', year: 1 } });
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [collegeSearch, setCollegeSearch] = useState('');
+  const dropdownRef = useRef(null);
+
+  const selectedCollege = watch('collegeName') || '';
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const filteredColleges = colleges.filter(([name]) => 
+    name.toLowerCase().includes(collegeSearch.toLowerCase())
+  );
+
   if (token) return <Navigate to="/" replace />;
   const getApiError = (error) => {
     if (!error) return 'Signup failed';
@@ -91,11 +113,85 @@ export const SignupPage = () => {
         </motion.div>
         
         <motion.div variants={formItem} className="sm:col-span-2">
-          <Input placeholder="College Name" list="college-names" {...register('collegeName')} />
-          <datalist id="college-names">
-            {colleges.map(([college, domain]) => <option key={college} value={college}>{domain}</option>)}
-          </datalist>
-          <p className="mt-1 text-xs text-slate-500">
+          <div ref={dropdownRef} className="relative w-full">
+            <div 
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="h-11 w-full flex items-center justify-between rounded-xl border border-black/10 bg-white/70 px-3.5 text-sm font-medium outline-none transition cursor-pointer dark:border-white/10 dark:bg-white/5 text-slate-800 dark:text-slate-200"
+            >
+              <span className={selectedCollege ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400/80 dark:text-slate-400/60 font-normal'}>
+                {selectedCollege || 'Select College'}
+              </span>
+              <svg
+                className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+            
+            <input type="hidden" {...register('collegeName')} />
+
+            <AnimatePresence>
+              {dropdownOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute z-50 mt-1.5 w-full rounded-2xl bg-white/95 dark:bg-[#15171e]/95 border border-black/10 dark:border-white/10 shadow-2xl backdrop-blur-md overflow-hidden p-2"
+                >
+                  {/* Search Input Box */}
+                  <div className="relative mb-2">
+                    <svg
+                      className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <input
+                      type="text"
+                      placeholder="Search college..."
+                      value={collegeSearch}
+                      onChange={(e) => setCollegeSearch(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-full h-9 pl-9 pr-4 text-xs rounded-xl border border-black/5 bg-slate-50 dark:bg-white/5 outline-none focus:border-aurora transition dark:border-white/5 text-slate-800 dark:text-slate-200"
+                    />
+                  </div>
+
+                  {/* Options List */}
+                  <div className="max-h-56 overflow-y-auto space-y-1 pr-1">
+                    {filteredColleges.length > 0 ? (
+                      filteredColleges.map(([college, domain]) => (
+                        <button
+                          key={college}
+                          type="button"
+                          onClick={() => {
+                            setValue('collegeName', college, { shouldValidate: true });
+                            setDropdownOpen(false);
+                            setCollegeSearch('');
+                          }}
+                          className={`w-full text-left px-3 py-2 text-xs rounded-xl hover:bg-slate-100 dark:hover:bg-white/10 transition-colors flex flex-col gap-0.5 ${
+                            selectedCollege === college ? 'bg-aurora/10 text-emerald-600 dark:text-aurora font-semibold' : 'text-slate-700 dark:text-slate-300'
+                          }`}
+                        >
+                          <span className="truncate">{college}</span>
+                          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">@{domain}</span>
+                        </button>
+                      ))
+                    ) : (
+                      <p className="text-center text-xs text-slate-500 py-3">No colleges found</p>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+          {errors.collegeName && <p className="mt-1 text-xs font-semibold text-flare">{errors.collegeName.message}</p>}
+          <p className="mt-2 text-xs text-slate-500">
             A matching college email domain verifies your student status automatically.
           </p>
         </motion.div>
