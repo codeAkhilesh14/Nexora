@@ -1,42 +1,95 @@
 # Nexora 🚀
 > **Nexora** is a production-ready, full-stack, campus-exclusive social ecosystem designed for verified college students in India.
 
-By blending anonymous-first interactions with progressive reveal mechanics, Nexora provides a secure yet exciting social environment. It brings together swipe deck discovery, realtime chat, mood-based public chatrooms, secret crush matching, approximate zone-based radar, tiered premium services (Razorpay), AI compatibility indexing, safety moderation, and a robust admin dashboard.
+By blending anonymous-first interactions with progressive reveal mechanics, Nexora provides a secure yet exciting social environment. It brings together swipe deck discovery, real-time chat, mood-based public chatrooms, secret crush matching, approximate zone-based radar, tiered premium services (Razorpay), dynamic similarity compatibility indexing, safety moderation, and a robust admin dashboard.
 
 ---
 
-## 🌟 Key Features
+## 📸 System Architecture & Information Flows
+
+### 1. General System Topology & Integrations
+```mermaid
+graph TD
+    Client["React Frontend (Vite)"] <--> |HTTPS / WSS| Backend["Express.js Server"]
+    Backend <--> |Mongoose| MongoDB[("MongoDB Atlas")]
+    
+    %% Integrations
+    Backend --> |Email OTP| Resend["Resend API"]
+    Backend --> |Image Uploads| Cloudinary["Cloudinary API"]
+    Backend --> |Payments & Webhooks| Razorpay["Razorpay API"]
+    Backend --> |AI Match Analysis| OpenRouter["OpenRouter DeepSeek API"]
+    
+    %% Internal Services
+    Backend <--> |Socket.io| WSConnection["Websocket Connection Manager"]
+    WSConnection <--> |Realtime Updates| Client
+    Backend --> |Deterministic Jaccard Fallback| MatchService["Match Service"]
+```
+
+### 2. Swipe-to-Match Logic & WebSocket Lifecycle
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Alice as User A (Alice)
+    actor Bob as User B (Bob)
+    participant Server as Express & Sockets
+    participant DB as MongoDB Atlas
+
+    Alice->>Server: POST /api/discovery/swipe (right, on Bob)
+    Server->>DB: Check reciprocal swipe from Bob
+    alt No reciprocal swipe
+        Server->>DB: Save Swipe (owner=Alice, target=Bob)
+        Server->>DB: Create Notification (type=like, to=Bob)
+        Server-->>Alice: Respond Swipe Saved (match = null)
+    else Reciprocal swipe exists (Bob already swiped right on Alice)
+        Server->>DB: Save Swipe (owner=Alice, target=Bob)
+        Server->>DB: Query Alice & Bob's profile tokens
+        Server->>Server: Compute Jaccard Similarity (30% - 99%)
+        Server->>DB: Create Match (users=[Alice, Bob], revealLevel=2)
+        Server->>DB: Create Chat (participants=[Alice, Bob])
+        Server->>DB: Create Notifications for both
+        Server->>Server: Broadcast match:new event to user:Alice & user:Bob rooms
+        Server-->>Alice: Respond Mutual Match! (match & chat details)
+        Server-->>Bob: Send Socket event (match:new)
+    end
+```
+
+### 3. Progressive Reveal Levels Architecture
+```mermaid
+graph LR
+    L1["Level 1: Anonymous Vibe<br/>(Nickname & Avatar only)"] --> L2["Level 2: Match Unlock<br/>(Show Compatibility Score & AI Explanation)"]
+    L2 --> L3["Level 3: Secret Crush / Photo Blur<br/>(Select as crush, photo is partially blurred)"]
+    L3 --> L4["Level 4: Share Room Thoughts<br/>(Full bio & details visible)"]
+    L4 --> L5["Level 5: Contact Reveal<br/>(Unblur real photo & swap contacts)"]
+```
+
+---
+
+## 🌟 Key Features & Technical Details
 
 ### 1. Domain-Gated Authentication & Verification
 - **Verified Signup:** Gatekeep registration through verified campus-specific email domains (e.g., `student@iitd.ac.in`).
-- **Resend OTP:** Realtime email verification using Resend email service.
-- **Secure Sessions:** Dual JWT architecture using secure HTTP-only cookies and token rotation mechanisms.
-- **Onboarding Journey:** Interactive multi-step onboarding path to customize nickname, select avatar, vibe tags, prompts, music taste, and study/relationship interests.
+- **Resend OTP Integration:** Uses the [email.service.js](file:///d:/Nexora/backend/server/services/email.service.js) to trigger verification codes using Resend with an automatic fallback mechanism.
+- **Secure Session Management:** Dual JWT architecture serving access & refresh tokens via secure, signed HttpOnly cookies to protect from XSS compromises.
+- **Onboarding Flow:** Interactive onboarding capturing nickname, bio, academic details, and personal prompts.
 
-### 2. Campus Discover
-- **Swipe-Deck Cards:** Rich, interactive 3D swipe cards with dynamic cursor hover lighting, showing profile details, vibe tags, and interests.
-- **Offline & Online Visibility:** Shows all matching campus students with active online/offline state indicators.
-- **Swipe Controls:** Classic swipe interactions—Swipe Right (Like), Swipe Left (Dismiss, reappears in 7 days), Super Like (Exclusive Premium features), and Rewind (premium swipe recovery).
+### 2. Campus Discover & Compatibility Matching
+- **Swipe-Deck Cards:** Rich, interactive swipe cards showing vibe tags, prompts, interest metrics, and online/offline status.
+- **Bag-of-Words Jaccard Similarity:** Profile compatibility matches are processed in [discovery.controller.js](file:///d:/Nexora/backend/server/controllers/discovery.controller.js) using text extraction from bio, branch, tags, prompts, and tastes. It tokenizes words, filters out stop-words, and calculates similarity:
+  $$\text{Jaccard Similarity} = \frac{|A \cap B|}{|A \cup B|}$$
+  Scores dynamically scale between 30% and 99% (profiles with no matching keywords receive a randomized baseline of 30%–39%).
+- **Super Likes & Rewind:** Nebula X subscribers can issue Super Likes or rewind mistakes.
 
 ### 3. Reveal-Ladder Chat System
-- **Progressive Reveal:** Profiles start fully anonymous. As users converse and interact, their reveal level advances:
-  1. *Level 1:* Anonymous Vibe (Initial state)
-  2. *Level 2:* Match unlock - compatibility index score & custom description generated via AI or deterministic algorithm
-  3. *Level 3:* Add Secret Crush / Blur Photo visible
-  4. *Level 4:* Share thoughts in rooms / partial info
-  5. *Level 5:* Contact exchange / real photo reveal
-- **Rich Realtime Chat:** Built on WebSockets via Socket.IO:
-  - Disappearing messages option (24h TTL).
-  - Soft-deletion of messages.
-  - Message reactions (emoji selector).
-  - Typing & read receipts.
+- **Real-Time Sockets:** Driven by Socket.IO with typing indicators, read receipts, and screenshots warnings (broadcasted instantly).
+- **Disappearing Messages:** Opt-in 24-hour TTL disappearing messages for added privacy.
+- **Soft Deletion & Reactions:** Clean interface allowing soft-deletion of messages and message emoji reactions.
 
 ### 4. Mood Rooms
-- **Themed Public Channels:** Eight campus rooms categorized by mood (e.g., *Exam Stress, Coding Night, Lonely Tonight, Anime Fans, Study Partner, Gym Bros, Breakup Recovery, Hackathon Team*).
-- **Realtime Broadcasts:** Live active room participant counts and instant message broadcasts.
-- **Message Limits & Auto-Expiry:** Prevents clutter with a 10-day message auto-expiry TTL, alongside daily message limits.
+- **Themed Public Channels:** Eight campus rooms categorized by mood (*Exam Stress, Coding Night, Lonely Tonight, Anime Fans, Study Partner, Gym Bros, Breakup Recovery, Hackathon Team*).
+- **Auto-Expiry (10-Day TTL):** Messages automatically expire from MongoDB database after 10 days to maintain low overhead.
+- **Dynamic Active Counters:** Counts unique active socket sessions connected to specific rooms.
 
-### 5. Secret Crush
+### 5. Secret Crush Match
 - **Mutual Reveals:** Add a crush via their college email.
 - **Insta-Matching:** If the crush adds you back, it triggers an instant mutual match, skipping the swipe deck, unlocking a direct chat room, and sending notifications.
 
@@ -48,31 +101,6 @@ By blending anonymous-first interactions with progressive reveal mechanics, Nexo
 - **Premium Tiers:** Spark (Pulse Pro), Plus (Orbit Z), and Max (Nebula X) plans with dynamic limits on swipes/messages.
 - **Premium Badges:** Unlocks unique user status badges (Pulse Pro, Orbit Z, Nebula X) and custom gradient page themes.
 
-### 8. Admin Control Plane
-- **Dashboard Metrics:** Tracks total active users, registered colleges, open moderation reports, and aggregate Razorpay revenue.
-- **Moderation Tools:** Manage reports, suspend or ban problematic profiles, and dynamically seed or configure colleges.
-
----
-
-## 🛠️ Technology Stack
-
-### Frontend
-- **Framework:** React 18, Vite (Fast builds, code-splitting)
-- **Routing:** React Router v6 (Nested protected layout paths)
-- **State Management:** Redux Toolkit, Redux Persist (Offline storage)
-- **Data Fetching:** TanStack Query v5 (Optimistic UI updates, caching)
-- **Styling & Animation:** Tailwind CSS v3, Framer Motion (Smooth 3D transitions)
-- **Icons & UI:** Lucide React, React Hot Toast (Sleek alerts)
-- **Forms & Validation:** React Hook Form, Zod
-
-### Backend
-- **Runtime:** Node.js, Express (ES Modules)
-- **Database:** MongoDB Atlas, Mongoose (Index optimization, TTL hooks)
-- **Realtime communications:** Socket.IO
-- **AI Engine:** DeepSeek (via OpenRouter compatibility) with deterministic backup algorithms
-- **Integrations:** Razorpay checkout & webhooks, Cloudinary image upload, Resend email service
-- **Security:** Helmet, CORS, Express rate limit, bcryptjs password hashing
-
 ---
 
 ## 📂 Project Structure
@@ -81,48 +109,117 @@ By blending anonymous-first interactions with progressive reveal mechanics, Nexo
 Nexora/
 ├── backend/
 │   ├── server/
-│   │   ├── config/          # Environment vars, database connections
-│   │   ├── controllers/     # Route logic (discovery, chat, subscription, rooms...)
-│   │   ├── middleware/      # Authentication, CORS, error handling
-│   │   ├── models/          # Mongoose database models (User, Chat, Message, Swipe...)
-│   │   ├── routes/          # Express route definitions
-│   │   ├── services/        # Third party APIs (AI indexer, payments, notifications)
-│   │   ├── sockets/         # WebSocket events (chat, rooms, active states)
-│   │   └── utils/           # Shared utility classes and errors
+│   │   ├── config/          # Environment variables, DB initialization, Razorpay setup
+│   │   ├── controllers/     # Route controllers (Auth, Discover, Chat, Room, Crush, Admin...)
+│   │   ├── middleware/      # Auth gates, CORS, Error handling, Rate limits, Validation schemas
+│   │   ├── models/          # Mongoose database models (User, Chat, Message, Match, RadarEvent...)
+│   │   ├── routes/          # Express route registration
+│   │   ├── services/        # Third party APIs (AI, Resend Email, Razorpay, Cloudinary)
+│   │   ├── sockets/         # WebSocket listeners & event emitters
+│   │   └── utils/           # Shared utility classes, errors, and catalogs
 │   ├── package.json
-│   └── render.yaml          # Deploy configurations
+│   └── render.yaml          # Render backend setup configuration
 ├── frontend/
 │   ├── src/
-│   │   ├── api/             # HTTP Client config
-│   │   ├── components/      # UI components (Button, Card, Input) & common utilities
-│   │   ├── features/        # Feature state slices (auth, admin, chat...)
-│   │   ├── hooks/           # Custom React hooks (theme tracking)
+│   │   ├── api/             # Base Axios HTTP client config
+│   │   ├── components/      # UI components (3D Swipe cards, layout wrappers, modals)
+│   │   ├── features/        # Redux State feature slices (auth, admin, chat...)
+│   │   ├── hooks/           # Custom theme & storage React hooks
 │   │   ├── layouts/         # Shared layouts (AppLayout & AuthShell)
 │   │   ├── pages/           # Page containers (Discover, Chats, Radar, Premium...)
-│   │   ├── redux/           # Global store setup
+│   │   ├── redux/           # Global store setup & middleware
 │   │   └── routes/          # Router and Protected route guards
 │   ├── package.json
-│   └── render.yaml          # Static frontend deploy instructions
+│   └── render.yaml          # Render static client host configuration
 └── README.md
 ```
 
 ---
 
-## 🚀 Local Installation & Setup
+## 🚦 REST API Endpoints
+
+### 🔐 Authentication (`/api/auth`)
+| Method | Endpoint | Description | Auth Required | Request Body |
+| :--- | :--- | :--- | :--- | :--- |
+| **POST** | `/signup` | Signup a new campus student | No | `email, phone, password, nickname` |
+| **POST** | `/login` | Authenticate student | No | `email, password` |
+| **POST** | `/verify-otp` | Confirm email OTP verification | No | `email, otp` |
+| **POST** | `/resend-otp` | Re-dispatch verification code | No | `email` |
+| **POST** | `/refresh` | Rotate JWT tokens | No | *Cookie: refreshToken* |
+| **POST** | `/forgot-password`| Initiate password reset workflow | No | `email` |
+| **POST** | `/reset-password` | Set new password with OTP | No | `email, otp, password` |
+| **POST** | `/logout` | Clear cookie sessions | Yes | None |
+| **GET**  | `/me` | Get currently signed-in profile | Yes | None |
+
+### 👤 Profile Management (`/api/profile`)
+| Method | Endpoint | Description | Auth Required | Request Body |
+| :--- | :--- | :--- | :--- | :--- |
+| **PATCH** | `/` | Update profile fields | Yes | `firstName, bio, branch, interests...` |
+| **POST** | `/avatar` | Upload profile avatar photo | Yes | *Multipart: avatar* |
+| **POST** | `/photo` | Upload real photo | Yes | *Multipart: photo* |
+| **POST** | `/reveal` | Manually increment identity reveal level | Yes | `level` |
+| **POST** | `/block/:userId` | Block a matching student | Yes | None |
+| **POST** | `/unblock/:userId` | Unblock a matching student | Yes | None |
+
+### 🔍 Discovery & Radar (`/api/discovery`)
+| Method | Endpoint | Description | Auth Required | Request Body |
+| :--- | :--- | :--- | :--- | :--- |
+| **GET** | `/deck` | Fetch discovery swipe cards deck | Yes | None |
+| **GET** | `/limits` | Fetch remaining daily swipe counts | Yes | None |
+| **POST** | `/swipe` | Swipe left, right, or super-like | Yes | `targetUserId, action` |
+| **POST** | `/rewind` | Rewind the previous swipe action | Yes | None |
+| **GET** | `/matches` | Retrieve active matched chats | Yes | None |
+| **POST** | `/radar` | Broadcast current campus radar location | Yes | `zone` |
+| **GET** | `/radar/users` | List students at specific radar zone | Yes | `zone` |
+
+### 💬 Chat & Public Rooms (`/api/chats` & `/api/rooms`)
+| Method | Endpoint | Description | Auth Required | Request Body |
+| :--- | :--- | :--- | :--- | :--- |
+| **GET** | `/api/chats` | List user's active chats | Yes | None |
+| **GET** | `/api/chats/limits` | Get daily direct message limits | Yes | None |
+| **GET** | `/api/chats/:chatId/messages` | Load chat messages | Yes | None |
+| **POST** | `/api/chats/:chatId/messages` | Dispatch chat message | Yes | `body, replyTo, disappearing` |
+| **POST** | `/api/chats/messages/:messageId/reactions` | React to a message | Yes | `emoji` |
+| **DELETE** | `/api/chats/messages/:messageId` | Soft-delete a message | Yes | None |
+| **GET** | `/api/rooms` | Retrieve themed mood rooms list | Yes | None |
+| **POST** | `/api/rooms/:roomId/join` | Join a mood room | Yes | None |
+| **GET** | `/api/rooms/:roomId/messages` | Load mood room messages | Yes | None |
+| **POST** | `/api/rooms/:roomId/messages` | Broadcast room message | Yes | `body` |
+
+### 💖 Secret Crush & Subscriptions (`/api/crushes` & `/api/subscriptions`)
+| Method | Endpoint | Description | Auth Required | Request Body |
+| :--- | :--- | :--- | :--- | :--- |
+| **GET** | `/api/crushes` | Retrieve user's added crushes | Yes | None |
+| **POST** | `/api/crushes` | Add a secret crush | Yes | `targetEmail, nickname, instagram` |
+| **POST** | `/api/subscriptions/orders` | Initialize Razorpay payment order | Yes | `plan` |
+| **POST** | `/api/subscriptions/verify` | Verify payment signature | Yes | `razorpay_order_id, razorpay_payment_id...` |
+
+---
+
+## 🔒 Safety, Privacy & Token Security
+
+1. **Aadhaar-Free Privacy Guard:** Nexora enforces absolute PII safety. We do NOT harvest Aadhaar details or passport databases. Academic authorization relies entirely on gated `.edu` domain email verifications.
+2. **Coordinate-Free Campus Radar:** We never persist active GPS coordinates. Students update general zone markers (e.g. `library`, `cafeteria`) which automatically drop off and purge from records after **6 hours**.
+3. **Automated Content Moderation:** Room messages and chats undergo toxic keyword checks and trust score calculations. Malicious behavior leads to trust score deductions or automatic moderation flags.
+4. **Token Security:** Authentication tokens (JWT) are stored and transported via HTTP-only cookies, rendering them inaccessible to client-side scripts to mitigate XSS risks.
+
+---
+
+## 🛠️ Local Installation & Setup
 
 ### Prerequisites
-- Node.js (>= 20.0.0)
-- MongoDB running locally or a MongoDB Atlas connection string.
+- **Node.js** (v20.0.0 or higher)
+- **MongoDB** running locally, or a remote **MongoDB Atlas** database instance.
 
-### Step 1: Clone and install backend dependencies
+### 1. Backend Server Setup
+Go to the backend folder and copy the template:
 ```bash
 cd backend
 cp .env.example .env
 npm install
 ```
 
-### Step 2: Configure Backend Environment Variables (`backend/.env`)
-Edit the `.env` file with your config:
+Configure your variables in `backend/.env`:
 ```env
 PORT=8080
 MONGODB_URI=mongodb://localhost:27017/nexora
@@ -131,61 +228,46 @@ JWT_REFRESH_SECRET=your_refresh_secret_key
 FRONTEND_URL=http://localhost:5173
 ADMIN_EMAIL=admin@nexora.in
 
-# Email OTP Settings (Resend)
+# Third Party Integrations
 RESEND_API_KEY=your_resend_api_key
-
-# AI and Cloudinary Settings (Optional)
 OPENROUTER_API_KEY=your_openrouter_key
 CLOUDINARY_CLOUD_NAME=your_cloudinary_name
 CLOUDINARY_API_KEY=your_cloudinary_key
 CLOUDINARY_API_SECRET=your_cloudinary_secret
 
-# Payment gateway configuration
+# Razorpay Payments
 RAZORPAY_KEY_ID=your_razorpay_key
 RAZORPAY_KEY_SECRET=your_razorpay_secret
 ```
 
-### Step 3: Run database seeding and start the backend
-Seed the initial list of colleges to register college email domains:
+### 2. Database Sync & Seeding
+To populate database domains and register authorized college codes (synced dynamically from [collegeCatalog.js](file:///d:/Nexora/backend/server/utils/collegeCatalog.js) on server start), initialize with:
 ```bash
 npm run seed:colleges
+```
+
+Start the backend development environment:
+```bash
 npm run dev
 ```
-*The API server will launch on `http://localhost:8080`. API health check endpoint: `/health`.*
+*API runs on `http://localhost:8080`. Target endpoint: `http://localhost:8080/health`.*
 
-### Step 4: Setup frontend dependencies
+### 3. Frontend Client Setup
+Move to the frontend folder, copy variables, and download modules:
 ```bash
 cd ../frontend
 cp .env.example .env
 npm install
 ```
 
-### Step 5: Configure Frontend Environment Variables (`frontend/.env`)
+Define backend targets in `frontend/.env`:
 ```env
 VITE_API_URL=http://localhost:8080/api
 VITE_SOCKET_URL=http://localhost:8080
 ```
 
-### Step 6: Start frontend dev server
+Fire up the frontend development server:
 ```bash
 npm run dev
 ```
-*Open `http://localhost:5173` in your browser.*
-
----
-
-## 🔒 Security & Privacy Architecture
-1. **Aadhaar Protection:** Nexora does NOT collect or store sensitive PII (Aadhaar cards, government ids). Instead, verified enrollment is enforced entirely by college-domain email OTP checks.
-2. **Safe Campus Radar:** Location is stored as general zones (`library`, `cafeteria`) instead of GPS coordinates to protect user privacy. Signal points expire automatically after 6 hours.
-3. **Automatic Content Moderation:** Incoming messages and room chats are moderate-checked against a toxic keyword blacklist or analyzed via AI triggers to decrement trust scores.
-4. **Token Security:** JWT access and refresh tokens are served via HttpOnly cookies, protecting the webapp from XSS or local storage compromises.
-
----
-
-## 🌐 Production Deployment
-Nexora is configured for quick deployment to **Render**:
-1. Create a MongoDB Atlas cluster and acquire a URI string.
-2. Connect your repository to Render.
-3. Use the pre-configured [backend/render.yaml](file:///d:/Nexora/backend/render.yaml) for the API container, and [frontend/render.yaml](file:///d:/Nexora/frontend/render.yaml) for the static client app.
-4. Ensure environment variables match requirements.
-5. In production console, seed the database with `npm run seed:colleges`.
+*Open `http://localhost:5173` to explore Nexora.*
