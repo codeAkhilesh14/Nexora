@@ -1,40 +1,27 @@
-import dns from 'node:dns';
 import nodemailer from 'nodemailer';
 import { env } from '../config/env.js';
-
-dns.setDefaultResultOrder('ipv4first');
 
 let transporter = null;
 
 // Initialize SMTP transporter
 if (env.smtp.host && env.smtp.user && env.smtp.pass) {
-  const isGmail = env.smtp.host.includes('gmail.com');
-  transporter = nodemailer.createTransport(isGmail ? {
-    service: 'gmail',
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    family: 4,
-    auth: {
-      user: env.smtp.user,
-      pass: env.smtp.pass
-    }
-  } : {
+  transporter = nodemailer.createTransport({
     host: env.smtp.host,
     port: env.smtp.port,
     secure: env.smtp.port === 465,
-    family: 4,
     auth: {
       user: env.smtp.user,
       pass: env.smtp.pass
-    }
+    },
+    connectionUrl: env.smtp.connectionUrl
   });
 
+  // Verify transporter connection
   transporter.verify((error, success) => {
     if (error) {
       console.error('[Email Service] SMTP Connection Failed:', error.message);
-    } else {
-      console.log('[Email Service] SMTP Connection Successful');
+    } else if (success) {
+      console.log('[Email Service] SMTP Connected Successfully');
     }
   });
 } else {
@@ -47,6 +34,7 @@ export const sendMail = async ({ to, subject, html }) => {
     console.error('[Email Service]', errorMsg);
     throw new Error(errorMsg);
   }
+
   try {
     const info = await transporter.sendMail({
       from: env.smtp.from,
@@ -54,6 +42,7 @@ export const sendMail = async ({ to, subject, html }) => {
       subject,
       html
     });
+    console.log(`[Email Service] Email sent successfully: ${info.messageId}`);
     return true;
   } catch (error) {
     console.error(`[Email Service] Failed to send email to ${to}:`, error.message);
@@ -92,3 +81,4 @@ export const sendResetPasswordOtpEmail = (to, otp) => sendMail({
     </div>
   `
 });
+
