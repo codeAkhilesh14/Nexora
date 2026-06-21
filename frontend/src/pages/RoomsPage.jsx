@@ -9,6 +9,7 @@ import { Input } from '../components/ui/Input.jsx';
 import { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { getSocket } from '../sockets/socket.js';
+import { LoadingSpinner } from '../components/common/LoadingSpinner.jsx';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -308,7 +309,7 @@ export const RoomsPage = () => {
   
   const messagesEndRef = useRef(null);
 
-  const { data } = useQuery({ 
+  const { data, isLoading } = useQuery({ 
     queryKey: ['rooms'], 
     queryFn: () => http.get('/rooms') 
   });
@@ -444,6 +445,14 @@ export const RoomsPage = () => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-172px)] h-[calc(100dvh-172px)]">
+        <LoadingSpinner fullScreen={false} />
+      </div>
+    );
+  }
+
   if (activeRoom) {
     const theme = getTheme(activeRoom.slug, activeRoom.mood);
     const progress = messageLimit ? Math.min((messagesUsed / messageLimit) * 100, 100) : 0;
@@ -492,10 +501,7 @@ export const RoomsPage = () => {
         {/* Messages Pane */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4 relative z-10">
           {loadingMessages ? (
-            <div className="flex flex-col items-center justify-center h-full space-y-2">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900 dark:border-white" />
-              <p className="text-xs text-slate-500">Loading whispers...</p>
-            </div>
+            <LoadingSpinner fullScreen={false} />
           ) : messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center space-y-2">
               <div className="h-12 w-12 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 dark:text-slate-500">

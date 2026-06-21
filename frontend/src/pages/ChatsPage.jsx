@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Crown, Send, SmilePlus, Timer, Zap } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
+import { LoadingSpinner } from '../components/common/LoadingSpinner.jsx';
 import { useSelector } from 'react-redux';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -31,10 +32,10 @@ export const ChatsPage = () => {
     '🤔', '😭', '😡', '😱', '👀', '💡', '🚀', '💯',
     '🎓', '🏫', '📚', '☕', '🍕', '🍻', '👋', '🙏'
   ];
-  const { data } = useQuery({ queryKey: ['chats'], queryFn: () => http.get('/chats') });
+  const { data, isLoading: chatsLoading } = useQuery({ queryKey: ['chats'], queryFn: () => http.get('/chats') });
   const chats = data?.data?.chats || [];
   const chatId = active?._id || chats[0]?._id;
-  const { data: messageData } = useQuery({ queryKey: ['messages', chatId], enabled: Boolean(chatId), queryFn: () => http.get(`/chats/${chatId}/messages`) });
+  const { data: messageData, isLoading: messagesLoading } = useQuery({ queryKey: ['messages', chatId], enabled: Boolean(chatId), queryFn: () => http.get(`/chats/${chatId}/messages`) });
   const messages = messageData?.data?.messages || [];
 
   useEffect(() => {
@@ -135,6 +136,14 @@ export const ChatsPage = () => {
     if (!chatId) return 'Match with someone to start chatting';
     return 'Write softly, safely...';
   };
+
+  if (chatsLoading) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-172px)] h-[calc(100dvh-172px)]">
+        <LoadingSpinner fullScreen={false} />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col lg:grid h-[calc(100vh-172px)] h-[calc(100dvh-172px)] lg:h-[calc(100vh-200px)] gap-3 sm:gap-4 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[330px_minmax(0,1fr)]">
@@ -269,7 +278,9 @@ export const ChatsPage = () => {
         </div>
 
         <div ref={containerRef} className="flex-1 space-y-3 overflow-y-auto p-4 bg-slate-50/50 dark:bg-ink/20 scroll-smooth">
-          {messages.map((m) => {
+          {messagesLoading ? (
+            <LoadingSpinner fullScreen={false} />
+          ) : messages.map((m) => {
             const senderId = m.sender?._id || m.sender;
             const mine = senderId === userId;
             return (

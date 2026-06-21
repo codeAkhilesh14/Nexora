@@ -10,6 +10,7 @@ import { Button } from '../components/ui/Button.jsx';
 import { Card } from '../components/ui/Card.jsx';
 import { Skeleton } from '../components/common/Skeleton.jsx';
 import { getSocket } from '../sockets/socket.js';
+import { LoadingSpinner } from '../components/common/LoadingSpinner.jsx';
 
 const radarZones = [
   { value: 'library', label: 'Library' },
@@ -639,30 +640,7 @@ export const DiscoverPage = () => {
 
         {/* Scrollable user grid */}
         {deckLoading ? (
-          <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="rounded-[20px] bg-white/85 dark:bg-[#111318] border border-slate-200/80 dark:border-white/[0.06] p-5 animate-pulse">
-                <div className="flex items-start gap-3.5">
-                  <div className="h-16 w-16 rounded-2xl bg-slate-200 dark:bg-white/5" />
-                  <div className="flex-1 space-y-2 pt-1">
-                    <div className="h-4 w-24 rounded-lg bg-slate-200 dark:bg-white/5" />
-                    <div className="h-3 w-16 rounded-lg bg-slate-200/60 dark:bg-white/[0.03]" />
-                    <div className="h-3 w-20 rounded-lg bg-slate-200/60 dark:bg-white/[0.03]" />
-                  </div>
-                </div>
-                <div className="mt-4 flex gap-1.5">
-                  <div className="h-5 w-14 rounded-lg bg-slate-200/60 dark:bg-white/[0.03]" />
-                  <div className="h-5 w-14 rounded-lg bg-slate-200/60 dark:bg-white/[0.03]" />
-                </div>
-                <div className="mt-4 h-px bg-slate-100 dark:bg-white/[0.04]" />
-                <div className="mt-3 flex gap-2">
-                  <div className="flex-1 h-10 rounded-xl bg-slate-200/60 dark:bg-white/[0.03]" />
-                  <div className="h-10 w-10 rounded-xl bg-slate-200/60 dark:bg-white/[0.03]" />
-                  <div className="flex-1 h-10 rounded-xl bg-slate-200/60 dark:bg-white/[0.03]" />
-                </div>
-              </div>
-            ))}
-          </div>
+          <LoadingSpinner fullScreen={false} />
         ) : users.length > 0 ? (
           <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2">
             <AnimatePresence mode="popLayout">

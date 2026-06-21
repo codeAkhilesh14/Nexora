@@ -8,6 +8,7 @@ import { http } from '../api/http.js';
 import { Button } from '../components/ui/Button.jsx';
 import { Card } from '../components/ui/Card.jsx';
 import { Input } from '../components/ui/Input.jsx';
+import { LoadingSpinner } from '../components/common/LoadingSpinner.jsx';
 
 export const CrushPage = () => {
   const qc = useQueryClient();
@@ -83,11 +84,7 @@ export const CrushPage = () => {
         </div>
 
         {isLoading ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((n) => (
-              <Card key={n} className="h-40 animate-pulse bg-slate-100 dark:bg-slate-900/50" />
-            ))}
-          </div>
+          <LoadingSpinner fullScreen={false} />
         ) : crushes.length === 0 ? (
           /* Premium Empty State */
           <Card className="flex flex-col items-center justify-center text-center p-12 border-dashed border-2 border-slate-200 dark:border-slate-800 bg-transparent">

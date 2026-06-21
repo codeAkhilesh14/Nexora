@@ -10,6 +10,7 @@ import { clearNotifications } from '../redux/realtimeSlice.js';
 import { getPremiumStyles } from './DiscoverPage.jsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
+import { LoadingSpinner } from '../components/common/LoadingSpinner.jsx';
 
 export const LikesRequestsPage = () => {
   const qc = useQueryClient();
@@ -83,12 +84,7 @@ export const LikesRequestsPage = () => {
 
         <div className="space-y-4">
           {isLoading || isFetching ? (
-            <Card>
-              <div className="animate-pulse space-y-3 py-10">
-                <div className="h-6 w-1/3 rounded-full bg-slate-200 dark:bg-slate-700" />
-                <div className="h-5 w-2/3 rounded-full bg-slate-200 dark:bg-slate-700" />
-              </div>
-            </Card>
+            <LoadingSpinner fullScreen={false} />
           ) : requests.length === 0 ? (
             <Card>
               <div className="space-y-3 py-12 text-center">

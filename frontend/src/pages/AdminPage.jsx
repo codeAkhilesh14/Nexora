@@ -2,9 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import { Activity, BadgeIndianRupee, School, ShieldAlert, Users } from 'lucide-react';
 import { http } from '../api/http.js';
 import { Card } from '../components/ui/Card.jsx';
+import { LoadingSpinner } from '../components/common/LoadingSpinner.jsx';
 
 export const AdminPage = () => {
-  const { data } = useQuery({ queryKey: ['admin-dashboard'], queryFn: () => http.get('/admin/dashboard') });
+  const { data, isLoading } = useQuery({ queryKey: ['admin-dashboard'], queryFn: () => http.get('/admin/dashboard') });
   const stats = data?.data || {};
   const items = [
     ['Users', stats.users, Users],
@@ -12,6 +13,10 @@ export const AdminPage = () => {
     ['Open reports', stats.reports, ShieldAlert],
     ['Revenue', `₹${Math.round((stats.revenuePaise || 0) / 100)}`, BadgeIndianRupee]
   ];
+  if (isLoading) {
+    return <LoadingSpinner fullScreen={false} />;
+  }
+
   return (
     <div>
       <h1 className="text-4xl font-black font-display">Admin Command</h1>
