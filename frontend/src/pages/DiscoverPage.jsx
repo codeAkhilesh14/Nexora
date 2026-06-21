@@ -171,6 +171,7 @@ const ProfileCard = forwardRef(({ profile, online, onAction, actionPending, inde
       style={{
         transformStyle: 'preserve-3d',
         perspective: '1000px',
+        willChange: 'transform',
       }}
       className={`group relative overflow-hidden rounded-[24px] bg-white/95 dark:bg-[#0f111a]/95 backdrop-blur-xl text-slate-800 dark:text-white transition-all duration-500 hover:shadow-glow-card ${cardBorderClass}`}
     >
@@ -201,7 +202,7 @@ const ProfileCard = forwardRef(({ profile, online, onAction, actionPending, inde
             <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-2xl bg-gradient-to-tr from-purple-500/20 via-pink-500/10 to-transparent dark:from-purple-500/30 dark:via-aurora/20 dark:to-transparent p-[2px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] transition-all duration-300 group-hover:from-purple-500 group-hover:via-flare group-hover:to-aurora">
               <div className="h-full w-full rounded-[14px] bg-[#f8fafc] dark:bg-[#1a1d24] grid place-items-center text-lg sm:text-2xl font-black overflow-hidden relative">
                 {profile.avatar ? (
-                  <img className="h-full w-full rounded-[14px] object-cover" src={profile.avatar} alt="" />
+                  <img className="h-full w-full rounded-[14px] object-cover" src={profile.avatar} alt="" loading="lazy" />
                 ) : (
                   <span className="bg-gradient-to-br from-teal-500 to-cyan-500 dark:from-aurora dark:to-cyan-400 bg-clip-text text-transparent">
                     {profile.nickname?.[0]?.toUpperCase()}

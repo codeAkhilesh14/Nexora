@@ -80,6 +80,8 @@ userSchema.methods.comparePassword = function comparePassword(candidate) {
 };
 
 userSchema.index({ college: 1, status: 1, updatedAt: -1 });
+userSchema.index({ college: 1, status: 1, 'premium.active': -1, updatedAt: -1 });
+userSchema.index({ 'locationSignal.zone': 1, 'locationSignal.updatedAt': -1 });
 userSchema.index({ college: 1, interests: 1 });
 userSchema.index({ 'premium.expiresAt': 1 });
 

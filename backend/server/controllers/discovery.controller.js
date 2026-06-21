@@ -177,6 +177,7 @@ export const getDeck = asyncHandler(async (req, res) => {
   })
     .select(anonymousProjection)
     .sort({ 'premium.active': -1, updatedAt: -1 })
+    .limit(80)
     .lean();
 
   const users = usersData.map(u => ({

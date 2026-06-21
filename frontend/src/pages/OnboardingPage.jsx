@@ -253,6 +253,7 @@ export const OnboardingPage = () => {
             linear-gradient(90deg, rgba(84, 244, 200, 0.05) 1px, transparent 1px)
           `,
           backgroundSize: '50px 50px',
+          willChange: 'transform',
           transform: 'perspective(500px) rotateX(60deg) translateY(-25%) scale(1.6)',
           transformOrigin: 'top center',
           animation: 'grid-scroll 18s linear infinite',

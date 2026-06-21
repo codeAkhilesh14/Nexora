@@ -9,6 +9,7 @@ const swipeSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 swipeSchema.index({ from: 1, to: 1 }, { unique: true });
+swipeSchema.index({ from: 1, action: 1, rewound: 1, createdAt: -1 });
 swipeSchema.index({ to: 1, action: 1 });
 
 export const Swipe = mongoose.model('Swipe', swipeSchema);
