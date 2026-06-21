@@ -1,37 +1,29 @@
-import dns from 'node:dns';
 import nodemailer from 'nodemailer';
 import { env } from '../config/env.js';
-
-dns.setDefaultResultOrder('ipv4first');
 
 let transporter = null;
 
 if (env.smtp.user && env.smtp.pass) {
   console.log('[SMTP CONFIG]', {
     host: 'smtp.gmail.com',
-    port: 587,
+    port: 465,
     user: env.smtp.user,
     from: env.smtp.from
   });
 
   transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
-    requireTLS: true,
+    port: 465,
+    secure: true,
 
     auth: {
       user: env.smtp.user,
-      pass: env.smtp.pass
+      pass: env.smtp.pass,
     },
 
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 10000,
-
-    tls: {
-      rejectUnauthorized: false
-    }
+    connectionTimeout: 30000,
+    greetingTimeout: 30000,
+    socketTimeout: 30000,
   });
 
   transporter.verify()
@@ -51,17 +43,13 @@ export const sendMail = async ({ to, subject, html }) => {
       from: env.smtp.from || env.smtp.user,
       to,
       subject,
-      html
+      html,
     });
 
     console.log('[Email Service] Email sent:', info.messageId);
     return true;
-
   } catch (error) {
-    console.error(
-      `[Email Service] Failed to send email to ${to}:`,
-      error
-    );
+    console.error(`[Email Service] Failed to send email to ${to}:`, error);
     throw error;
   }
 };
@@ -71,7 +59,7 @@ export const sendOtpEmail = async (to, otp) => {
     to,
     subject: 'Verify your Nexora account',
     html: `
-      <div style="font-family:Arial,sans-serif">
+      <div style="font-family: Arial, sans-serif;">
         <h2>Email Verification</h2>
         <p>Your OTP is:</p>
         <h1>${otp}</h1>
@@ -86,7 +74,7 @@ export const sendResetPasswordOtpEmail = async (to, otp) => {
     to,
     subject: 'Reset your Nexora password',
     html: `
-      <div style="font-family:Arial,sans-serif">
+      <div style="font-family: Arial, sans-serif;">
         <h2>Password Reset</h2>
         <p>Your OTP is:</p>
         <h1>${otp}</h1>
