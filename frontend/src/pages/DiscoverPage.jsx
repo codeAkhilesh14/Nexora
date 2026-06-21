@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, RotateCcw, Sparkles, X, Users, Search, Zap, Crown, MapPin, Rocket, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, forwardRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { http } from '../api/http.js';
@@ -88,7 +88,7 @@ export const getPremiumStyles = (premium) => {
   return null;
 };
 
-const ProfileCard = ({ profile, online, onAction, actionPending, index }) => {
+const ProfileCard = forwardRef(({ profile, online, onAction, actionPending, index }, ref) => {
   const { user } = useSelector((state) => state.auth);
   const profileOnline = Boolean(profile._id && online[profile._id]);
   const userIsPremium = user?.premium?.active;
@@ -103,14 +103,22 @@ const ProfileCard = ({ profile, online, onAction, actionPending, index }) => {
     : `border border-slate-200/50 dark:border-white/[0.08] shadow-[0_12px_40px_-12px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_-20px_rgba(0,0,0,0.7)] ${glow} hover:border-slate-300/60 dark:hover:border-white/[0.12]`;
   const bgGradient = premiumStyles ? premiumStyles.gradient : gradient;
 
-  const cardRef = useRef(null);
+  const localRef = useRef(null);
+  const setRefs = (node) => {
+    localRef.current = node;
+    if (typeof ref === 'function') {
+      ref(node);
+    } else if (ref) {
+      ref.current = node;
+    }
+  };
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
   const [isHovered, setIsHovered] = useState(false);
 
   const handleMouseMove = (e) => {
-    if (!cardRef.current) return;
-    const card = cardRef.current;
+    if (!localRef.current) return;
+    const card = localRef.current;
     const rect = card.getBoundingClientRect();
 
     const xVal = e.clientX - rect.left;
@@ -140,7 +148,7 @@ const ProfileCard = ({ profile, online, onAction, actionPending, index }) => {
 
   return (
     <motion.div
-      ref={cardRef}
+      ref={setRefs}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -289,7 +297,7 @@ const ProfileCard = ({ profile, online, onAction, actionPending, index }) => {
       </div>
     </motion.div>
   );
-};
+});
 
 export const DiscoverPage = () => {
   const qc = useQueryClient();

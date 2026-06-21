@@ -137,7 +137,7 @@ export const ChatsPage = () => {
   };
 
   return (
-    <div className="flex flex-col lg:grid h-[calc(100vh-144px)] h-[calc(100dvh-144px)] lg:h-[calc(100vh-200px)] gap-3 sm:gap-4 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[330px_minmax(0,1fr)]">
+    <div className="flex flex-col lg:grid h-[calc(100vh-172px)] h-[calc(100dvh-172px)] lg:h-[calc(100vh-200px)] gap-3 sm:gap-4 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[330px_minmax(0,1fr)]">
       <Card className={`max-h-[100%] overflow-hidden p-0 flex-col ${active ? 'hidden lg:flex' : 'flex'}`}>
         <div className="border-b border-black/10 p-3 sm:p-4 dark:border-white/10"><h1 className="text-xl sm:text-2xl font-black font-display">Chats</h1></div>
         <div className="flex-1 overflow-y-auto p-2 space-y-1">

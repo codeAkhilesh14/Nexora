@@ -4,7 +4,6 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import helmet from 'helmet';
-import morgan from 'morgan';
 import { Server } from 'socket.io';
 import { connectDB } from './config/db.js';
 import { env } from './config/env.js';
@@ -42,7 +41,6 @@ app.set('io', io);
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(cors(corsOptions));
 app.use(cookieParser());
-app.use(morgan(env.nodeEnv === 'production' ? 'combined' : 'dev'));
 
 app.post('/api/subscriptions/webhook', express.raw({ type: 'application/json' }), subscriptionWebhook);
 app.use(express.json({ limit: '1mb' }));
