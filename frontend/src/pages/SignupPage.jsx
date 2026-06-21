@@ -79,7 +79,8 @@ const colleges = [
   ['Dronacharya College of Engineering', 'dronacharya.info'],
   ['KIET Group of Institutions', 'kiet.edu'],
   ['IMS Engineering College', 'imsec.ac.in'],
-  ['RKGIT', 'rkgit.edu.in']
+  ['RKGIT', 'rkgit.edu.in'],
+  ['Birla Institute of Technology Mesra', 'bitmesra.ac.in']
 ];
 
 const formContainer = {

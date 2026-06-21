@@ -21,7 +21,8 @@ const colleges = [
   'Galgotias University',
   'Amity University Noida',
   'Indraprastha Institute of Information Technology Delhi',
-  'Guru Gobind Singh Indraprastha University'
+  'Guru Gobind Singh Indraprastha University',
+  'Birla Institute of Technology Mesra'
 ];
 
 const fieldLabels = {

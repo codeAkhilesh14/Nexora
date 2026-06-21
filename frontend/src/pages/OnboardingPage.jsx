@@ -44,7 +44,7 @@ export const OnboardingPage = () => {
     {
       title: 'Welcome to the Orbit',
       subtitle: 'Your verified college space',
-      desc: 'Connect, study, and share secrets safely inside your own verified campus network. No outsiders allowed.',
+      desc: 'Engage, study, and share anonymously with verified peers exclusive to your institution. To ensure academic privacy, your discovery feed is restricted strictly to students of your own college.',
       color: 'from-emerald-500/20 to-teal-500/10',
       textColor: 'text-emerald-400',
       icon: Compass,
