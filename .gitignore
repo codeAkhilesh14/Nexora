@@ -1,0 +1,3 @@
+# API Keys & Secrets
+backend/.env
+frontend/.env

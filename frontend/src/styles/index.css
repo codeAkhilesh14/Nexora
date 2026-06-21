@@ -1,0 +1,237 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Typography Foundation ── */
+@layer base {
+  :root {
+    color-scheme: light;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .dark {
+    color-scheme: dark;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background:
+      radial-gradient(circle at top left, rgba(84, 244, 200, 0.14), transparent 28rem),
+      radial-gradient(circle at bottom right, rgba(255, 77, 141, 0.12), transparent 28rem),
+      #f8fafc;
+    color: #111827;
+    overflow-x: hidden;
+    position: relative;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    letter-spacing: -0.011em;
+    line-height: 1.6;
+    transition: background-color 0.3s ease;
+  }
+
+  .dark body {
+    background:
+      radial-gradient(circle at top left, rgba(84, 244, 200, 0.14), transparent 30rem),
+      radial-gradient(circle at bottom right, rgba(255, 77, 141, 0.12), transparent 30rem),
+      #09090f;
+    color: #f8fafc;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -10;
+    pointer-events: none;
+    background-image: 
+      linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    transform: perspective(600px) rotateX(60deg) translateY(-30%) scale(1.6);
+    transform-origin: top center;
+    opacity: 0.65;
+    animation: grid-scroll 24s linear infinite;
+  }
+
+  .dark body::before {
+    background-image: 
+      linear-gradient(rgba(84, 244, 200, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(84, 244, 200, 0.035) 1px, transparent 1px);
+    opacity: 0.8;
+  }
+
+  /* ── Heading defaults ── */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Space Grotesk", "Inter", ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    font-weight: 700;
+  }
+
+  h1 { font-size: 2.25rem; }
+  h2 { font-size: 1.75rem; }
+  h3 { font-size: 1.375rem; }
+
+  /* Paragraph readability */
+  p {
+    line-height: 1.65;
+  }
+
+  /* Tighter small text */
+  small, .text-xs, .text-sm {
+    letter-spacing: 0em;
+  }
+
+  /* Improved link defaults */
+  a {
+    text-decoration-skip-ink: auto;
+  }
+}
+
+/* ── Utility styles ── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.5) transparent;
+  box-sizing: border-box;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(22px);
+}
+
+.dark .glass {
+  background: rgba(12, 12, 20, 0.7);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.24), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+/* ── Mobile-first touch & scroll enhancements ── */
+@media (max-width: 639px) {
+  html {
+    font-size: 15px;
+  }
+
+  /* Prevent iOS input zoom, but allow explicit class overrides */
+  input, select, textarea {
+    font-size: 16px;
+  }
+}
+
+/* Safe-area inset support for notched devices */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+.custom-toast {
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.85) !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.dark .custom-toast {
+  background: rgba(15, 15, 25, 0.85) !important;
+  color: #f8fafc !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Ensure native select dropdown options are readable in both light and dark modes */
+option {
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
+.dark option {
+  background-color: #0f0f15;
+  color: #f8fafc;
+}
+
+/* ── Modern Premium Animations ── */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradient-shift {
+  background-size: 200% 200%;
+  animation: gradient-shift 6s ease infinite;
+}
+
+@keyframes radar-sweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-radar-sweep {
+  animation: radar-sweep 5s linear infinite;
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.25; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(1.05); }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
+}
+
+@keyframes grid-scroll {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 60px;
+  }
+}
+
+.shadow-glow-card {
+  box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.08), 0 0 20px -2px rgba(84, 244, 200, 0.08);
+}
+
+.dark .shadow-glow-card {
+  box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5), 0 0 24px -2px rgba(84, 244, 200, 0.12);
+}
+
+/* ── Mobile Text Crispness Fix ── */
+@media (max-width: 1024px) {
+  :root {
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
+    text-rendering: auto;
+  }
+
+  body, input, select, textarea, button, p, span, div, h1, h2, h3, h4, h5, h6 {
+    -webkit-font-smoothing: subpixel-antialiased;
+    text-rendering: auto;
+  }
+}
+
