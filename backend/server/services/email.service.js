@@ -1,84 +1,97 @@
+import dns from 'node:dns';
 import nodemailer from 'nodemailer';
 import { env } from '../config/env.js';
 
+dns.setDefaultResultOrder('ipv4first');
+
 let transporter = null;
 
-// Initialize SMTP transporter
-if (env.smtp.host && env.smtp.user && env.smtp.pass) {
+if (env.smtp.user && env.smtp.pass) {
+  console.log('[SMTP CONFIG]', {
+    host: 'smtp.gmail.com',
+    port: 587,
+    user: env.smtp.user,
+    from: env.smtp.from
+  });
+
   transporter = nodemailer.createTransport({
-    host: env.smtp.host,
-    port: env.smtp.port,
-    secure: env.smtp.port === 465,
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    requireTLS: true,
+
     auth: {
       user: env.smtp.user,
       pass: env.smtp.pass
     },
-    connectionUrl: env.smtp.connectionUrl
-  });
 
-  // Verify transporter connection
-  transporter.verify((error, success) => {
-    if (error) {
-      console.error('[Email Service] SMTP Connection Failed:', error.message);
-    } else if (success) {
-      console.log('[Email Service] SMTP Connected Successfully');
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
+
+    tls: {
+      rejectUnauthorized: false
     }
   });
-} else {
-  console.warn('[Email Service] SMTP not configured. Please set SMTP_HOST, SMTP_USER, and SMTP_PASS environment variables.');
+
+  transporter.verify()
+    .then(() => {
+      console.log('[Email Service] SMTP Connection Successful');
+    })
+    .catch((error) => {
+      console.error('[Email Service] SMTP Connection Failed:', error);
+    });
 }
 
 export const sendMail = async ({ to, subject, html }) => {
-  if (!transporter) {
-    const errorMsg = 'SMTP not configured. Cannot send email: ' + subject + ' to ' + to;
-    console.error('[Email Service]', errorMsg);
-    throw new Error(errorMsg);
-  }
-
   try {
+    console.log(`[Email Service] Sending email to ${to}`);
+
     const info = await transporter.sendMail({
-      from: env.smtp.from,
+      from: env.smtp.from || env.smtp.user,
       to,
       subject,
       html
     });
-    console.log(`[Email Service] Email sent successfully: ${info.messageId}`);
+
+    console.log('[Email Service] Email sent:', info.messageId);
     return true;
+
   } catch (error) {
-    console.error(`[Email Service] Failed to send email to ${to}:`, error.message);
+    console.error(
+      `[Email Service] Failed to send email to ${to}:`,
+      error
+    );
     throw error;
   }
 };
 
-export const sendOtpEmail = (to, otp) => sendMail({
-  to,
-  subject: 'Verify your Nexora campus email',
-  html: `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2>Email Verification</h2>
-      <p>Welcome to Nexora! Your verification code is:</p>
-      <div style="background-color: #f0f0f0; padding: 15px; text-align: center; border-radius: 5px; margin: 20px 0;">
-        <h1 style="margin: 0; color: #333; letter-spacing: 5px;">${otp}</h1>
+export const sendOtpEmail = async (to, otp) => {
+  return sendMail({
+    to,
+    subject: 'Verify your Nexora account',
+    html: `
+      <div style="font-family:Arial,sans-serif">
+        <h2>Email Verification</h2>
+        <p>Your OTP is:</p>
+        <h1>${otp}</h1>
+        <p>This OTP expires in 10 minutes.</p>
       </div>
-      <p>This code expires in <b>10 minutes</b>. Do not share it with anyone.</p>
-      <p>If you didn't request this code, you can safely ignore this email.</p>
-    </div>
-  `
-});
+    `
+  });
+};
 
-export const sendResetPasswordOtpEmail = (to, otp) => sendMail({
-  to,
-  subject: 'Reset your Nexora password',
-  html: `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2>Password Reset Request</h2>
-      <p>Your password reset code is:</p>
-      <div style="background-color: #f0f0f0; padding: 15px; text-align: center; border-radius: 5px; margin: 20px 0;">
-        <h1 style="margin: 0; color: #333; letter-spacing: 5px;">${otp}</h1>
+export const sendResetPasswordOtpEmail = async (to, otp) => {
+  return sendMail({
+    to,
+    subject: 'Reset your Nexora password',
+    html: `
+      <div style="font-family:Arial,sans-serif">
+        <h2>Password Reset</h2>
+        <p>Your OTP is:</p>
+        <h1>${otp}</h1>
+        <p>This OTP expires in 10 minutes.</p>
       </div>
-      <p>This code expires in <b>10 minutes</b>. Do not share it with anyone.</p>
-      <p>If you didn't request this code, you can safely ignore this email.</p>
-    </div>
-  `
-});
-
+    `
+  });
+};
