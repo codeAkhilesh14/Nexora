@@ -63,6 +63,8 @@ graph LR
 ```
 
 ---
+## 🌟 Nexora
+
 <img width="1880" height="910" alt="{B0EE258E-3548-46FC-95F3-A9CBC4D21AAB}" src="https://github.com/user-attachments/assets/23f81504-cb71-4351-a43c-671919269189" />
 
 <img width="1884" height="904" alt="{84D7C08A-EBA0-4049-A2CD-F36DCCB8A8AB}" src="https://github.com/user-attachments/assets/7d88692f-54c5-45f5-822a-14fc17c4e563" />
