@@ -8,6 +8,10 @@ if (env.smtp.host && env.smtp.user && env.smtp.pass) {
   const isGmail = env.smtp.host.includes('gmail.com');
   transporter = nodemailer.createTransport(isGmail ? {
     service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    family: 4,
     auth: {
       user: env.smtp.user,
       pass: env.smtp.pass
@@ -16,6 +20,7 @@ if (env.smtp.host && env.smtp.user && env.smtp.pass) {
     host: env.smtp.host,
     port: env.smtp.port,
     secure: env.smtp.port === 465,
+    family: 4,
     auth: {
       user: env.smtp.user,
       pass: env.smtp.pass
