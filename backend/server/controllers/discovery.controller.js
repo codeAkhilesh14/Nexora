@@ -8,7 +8,7 @@ import { ApiError } from '../utils/ApiError.js';
 import { ok } from '../utils/ApiResponse.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
-const anonymousProjection = 'nickname avatar branch year gender bio interests vibeTags musicTaste prompts relationshipGoals premium revealLevel';
+const anonymousProjection = 'nickname firstName avatar branch year gender bio interests vibeTags musicTaste prompts relationshipGoals premium revealLevel';
 
 const getProfileWords = (user) => {
   const words = [];

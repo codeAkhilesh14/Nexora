@@ -224,7 +224,7 @@ const ProfileCard = forwardRef(({ profile, online, onAction, actionPending, inde
           {/* Name & Meta */}
           <div className="flex-1 min-w-0 pt-0.5">
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-base sm:text-lg font-extrabold tracking-tight truncate font-display text-purple-600 dark:text-purple-400">{profile.nickname}</h3>
+              <h3 className="text-base sm:text-lg font-extrabold tracking-tight truncate font-display text-purple-600 dark:text-purple-400">{profile.firstName || profile.nickname}</h3>
               {premiumStyles ? (
                 <span className={`shrink-0 inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider ${premiumStyles.badgeClass}`}>
                   <premiumStyles.icon size={8} className="shrink-0" />
