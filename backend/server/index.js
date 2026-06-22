@@ -24,7 +24,6 @@ import subscriptionRoutes from './routes/subscription.routes.js';
 import reportRoutes from './routes/report.routes.js';
 import { webhook as subscriptionWebhook } from './controllers/subscription.controller.js';
 import { registerSockets } from './sockets/index.js';
-import { syncCollegeCatalog } from './utils/collegeCatalog.js';
 
 dotenv.config();
 
@@ -68,7 +67,6 @@ app.use(notFound);
 app.use(errorHandler);
 
 await connectDB();
-await syncCollegeCatalog();
 server.listen(env.port, () => {
   console.log('Server is running on port no 8080');
 });
