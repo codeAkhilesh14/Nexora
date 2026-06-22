@@ -5,6 +5,16 @@ By blending anonymous-first interactions with progressive reveal mechanics, Nexo
 
 ---
 
+# Testing Credential
+
+```
+User-> id: av14021999@gmail.com, password: 123456789
+Admin-> id: founder@nexora.in, password: adminpassword123
+```
+These are testing id when i public this Nexora web application then student/user need to use their college id then only Nexora will work
+
+---
+
 ## 📸 System Architecture & Information Flows
 
 ### 1. General System Topology & Integrations
