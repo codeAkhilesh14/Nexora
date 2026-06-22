@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { HeartHandshake, Instagram, Lock, Plus, X, Heart, ShieldAlert, Sparkles, Send, Mail } from 'lucide-react';
+import { HeartHandshake, Instagram, Lock, Plus, X, Heart, Sparkles, Send, Mail } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
@@ -266,7 +266,7 @@ export const CrushPage = () => {
                   <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 font-display">
                     Add Secret Crush
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                  <p className="text-xs text-yellow-500 dark:text-yellow-400 leading-relaxed">
                     Add someone secretly using their college email. Your crush list remains strictly private. If they also add you back, you both get matched and can start chatting!
                   </p>
                 </div>
@@ -319,14 +319,6 @@ export const CrushPage = () => {
                     <p className="text-[10px] text-slate-400 dark:text-slate-500">
                       Optional. Stored as display details.
                     </p>
-                  </div>
-
-                  {/* Warning Notice */}
-                  <div className="p-3 bg-amber-500/5 border border-amber-500/10 rounded-xl flex items-start gap-2.5 text-[11px] text-amber-600 dark:text-amber-400 leading-normal">
-                    <ShieldAlert size={14} className="shrink-0 mt-0.5" />
-                    <span>
-                      College email is required and acts as the unique matching key. Instagram and Nickname are stored as supplementary display details.
-                    </span>
                   </div>
 
                   {/* Action Buttons */}
