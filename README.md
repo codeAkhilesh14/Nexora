@@ -228,6 +228,348 @@ Nexora/
   
 ---
 
+## 🗄️ Database Models Schema
+
+Nexora uses **MongoDB Atlas** with **Mongoose** ODM. Below is the detailed schema layout for each of the core models in the system.
+
+<details>
+<summary>👤 1. User Model Schema</summary>
+
+### User Schema (`User.js`)
+Represents a verified campus user, student, or administrator.
+
+| Field | Type | Description / Constraints | Default |
+| :--- | :--- | :--- | :--- |
+| `email` | `String` | Required, lowercase, trimmed, unique. Must belong to an authorized college domain. | None |
+| `phone` | `String` | Trimmed, sparse, unique. Mobile number. | None |
+| `password` | `String` | Required. Hidden by default (`select: false`). Bcrypt-hashed. | None |
+| `nickname` | `String` | Required, trimmed, unique. Length: 3 - 24 chars. | None |
+| `firstName` | `String` | Trimmed. Max length: 60 chars. | None |
+| `avatar` | `String` | URL of the profile avatar. | `''` |
+| `realPhoto` | `String` | URL of the real verified photo. | `''` |
+| `realPhotoVisibleToMatches` | `Boolean` | Visibility toggle for matches to see the unblurred real photo. | `false` |
+| `bio` | `String` | User bio. Max length: 280 chars. | `''` |
+| `branch` | `String` | Trimmed. Academic branch/department. | None |
+| `year` | `Number` | Academic year (range: 1 - 6). | None |
+| `gender` | `String` | Enum: `['woman', 'man', 'non_binary', 'prefer_not']`. | `'prefer_not'` |
+| `relationshipGoals` | `[String]` | Array of enums: `['crush', 'friends', 'relationship', 'study_partner', 'teammate', 'networking']`. | `[]` |
+| `studyInterests` | `[String]` | List of academic/study subjects. | `[]` |
+| `interests` | `[String]` | List of general hobbies and interests. | `[]` |
+| `vibeTags` | `[String]` | Profile tags describing vibe. | `[]` |
+| `musicTaste` | `[String]` | List of music genres or artists. | `[]` |
+| `prompts` | `[promptSchema]` | Array of Q&A profile prompts (Max 240 chars answer). | `[]` |
+| `college` | `ObjectId` | Reference to [College](file:///d:/Nexora/backend/server/models/College.js). Required, Indexed. | None |
+| `collegeDomain` | `String` | Gated email domain corresponding to the college. Required. | None |
+| `studentVerified` | `Boolean` | Flag indicating identity/student verification status. | `false` |
+| `emailVerified` | `Boolean` | Flag indicating OTP verification status of the email. | `false` |
+| `profileComplete` | `Boolean` | Flag representing completion of the onboarding flow. | `false` |
+| `ageVerified` | `Boolean` | Safety age gate verification status. | `true` |
+| `anonymousMode` | `Boolean` | Toggle for profile anonymity. | `true` |
+| `revealLevel` | `Number` | Reveal level (range: 1 - 5). | `1` |
+| `xp` | `Number` | Gamification experience points. | `0` |
+| `role` | `String` | Enum: `['student', 'admin']`. | `'student'` |
+| `premium` | `Object` | Premium subscription tracking details. | Details below |
+| `premium.active` | `Boolean` | Subscription active flag. | `false` |
+| `premium.plan` | `String` | Enum: `['pulse_pro', 'orbit_z', 'nebula_x', 'spark', 'plus', 'max', null]`. | `null` |
+| `premium.expiresAt` | `Date` | Subscription expiry timestamp. | None |
+| `premium.badge` | `Boolean` | Displays premium profile badge. | `false` |
+| `limits` | `Object` | Swipe and chat limits tracker (resets daily). | Details below |
+| `limits.swipesToday`| `Number` | Total swipe card operations performed today. | `0` |
+| `limits.chatsToday` | `Number` | Total message chat requests initiated today. | `0` |
+| `limits.resetAt` | `Date` | Daily reset timestamp. | `Date.now` |
+| `locationSignal` | `Object` | Zone-based presence signal. | Details below |
+| `locationSignal.zone` | `String` | Campus location zone enum. | `null` |
+| `locationSignal.updatedAt` | `Date` | Last signal update timestamp. | None |
+| `safety` | `Object` | Trust and community guidelines safety object. | Details below |
+| `safety.blockedUsers` | `[ObjectId]` | References to blocked [User](file:///d:/Nexora/backend/server/models/User.js) accounts. | `[]` |
+| `safety.reportsCount` | `Number` | Total reports submitted against the user. | `0` |
+| `safety.trustScore` | `Number` | User trust index (range: 0 - 100). | `100` |
+| `refreshTokenVersion` | `Number` | Revocation tracker for active JWT refresh tokens. | `0` |
+| `otp` | `Object` | Temporary signup/login authentication OTP hash container. | Details below |
+| `otp.hash` | `String` | SHA256 hashed verification token. | None |
+| `otp.expiresAt` | `Date` | Expiry window for OTP validity. | None |
+| `resetPassword` | `Object` | Hashed code container for resetting passwords. | Details below |
+| `resetPassword.hash` | `String` | SHA256 hashed password reset token. | None |
+| `resetPassword.expiresAt` | `Date` | Expiry window for reset action. | None |
+| `status` | `String` | Enum: `['active', 'suspended', 'banned']`. Indexed. | `'active'` |
+| `lastSeenAt` | `Date` | Presence tracking timestamp. | None |
+
+* **Timestamps:** Automatically generated `createdAt` and `updatedAt` fields.
+* **Database Indexes:**
+  * `{ college: 1, status: 1, updatedAt: -1 }`
+  * `{ college: 1, status: 1, 'premium.active': -1, updatedAt: -1 }`
+  * `{ 'locationSignal.zone': 1, 'locationSignal.updatedAt': -1 }`
+  * `{ college: 1, interests: 1 }`
+  * `{ 'premium.expiresAt': 1 }`
+
+</details>
+
+<details>
+<summary>💬 2. Chat Model Schema</summary>
+
+### Chat Schema (`Chat.js`)
+Represents an active direct messaging thread between matched users, or a public channel.
+
+| Field | Type | Description / Constraints | Default |
+| :--- | :--- | :--- | :--- |
+| `type` | `String` | Required. Enum: `['match', 'room']`. | None |
+| `match` | `ObjectId` | Reference to [Match](file:///d:/Nexora/backend/server/models/Match.js). | None |
+| `room` | `ObjectId` | Reference to [Room](file:///d:/Nexora/backend/server/models/Room.js). | None |
+| `participants` | `[ObjectId]` | References to [User](file:///d:/Nexora/backend/server/models/User.js). | `[]` |
+| `college` | `ObjectId` | Reference to [College](file:///d:/Nexora/backend/server/models/College.js). Required, Indexed. | None |
+| `lastMessage` | `ObjectId` | Reference to [Message](file:///d:/Nexora/backend/server/models/Message.js) to display on sidebar preview. | None |
+| `expiresMessagesAfterSeconds` | `Number` | Time-to-Live settings for disappearing chat messages. | None |
+
+* **Timestamps:** Automatically generated `createdAt` and `updatedAt` fields.
+* **Database Indexes:**
+  * `{ participants: 1, updatedAt: -1 }`
+  * `{ match: 1 }` (Sparse, Unique)
+
+</details>
+
+<details>
+<summary>🏫 3. College Model Schema</summary>
+
+### College Schema (`College.js`)
+Represents an authorized college institution on the Nexora network.
+
+| Field | Type | Description / Constraints | Default |
+| :--- | :--- | :--- | :--- |
+| `name` | `String` | Required, trimmed. Full legal name of the institution. | None |
+| `code` | `String` | Required, uppercase, trimmed, unique. Short registration code. | None |
+| `domains` | `[String]` | Required, lowercase, trimmed, unique. List of allowed email domains (e.g., `iitd.ac.in`). | None |
+| `city` | `String` | Location city/region. | `'Delhi NCR'` |
+| `zones` | `[String]` | Allowable locations zones for Campus Radar (e.g., `library`, `cafeteria`, `courtyard`). | `[]` |
+| `active` | `Boolean` | Activation toggle for the college. | `true` |
+
+* **Timestamps:** Automatically generated `createdAt` and `updatedAt` fields.
+* **Database Indexes:**
+  * `{ code: 1 }` (Unique)
+  * `{ domains: 1 }` (Unique)
+
+</details>
+
+<details>
+<summary>💖 4. Crush Model Schema</summary>
+
+### Crush Schema (`Crush.js`)
+Stores entries matching students with their secret crushes.
+
+| Field | Type | Description / Constraints | Default |
+| :--- | :--- | :--- | :--- |
+| `owner` | `ObjectId` | Reference to the [User](file:///d:/Nexora/backend/server/models/User.js) who initiated the crush request. Required. | None |
+| `college` | `ObjectId` | Reference to [College](file:///d:/Nexora/backend/server/models/College.js). Required, Indexed. | None |
+| `targetEmail` | `String` | Required, lowercase, trimmed. Institutional email of target user. | None |
+| `nickname` | `String` | Lowercase, trimmed. Display nickname. | None |
+| `instagram` | `String` | Lowercase, trimmed. Instagram handle of target. | None |
+| `targetUser` | `ObjectId` | Reference to matching [User](file:///d:/Nexora/backend/server/models/User.js) (once registered). | None |
+| `revealed` | `Boolean` | Flag indicating match status of the crush request. | `false` |
+| `revealedAt` | `Date` | Timestamp of matching reveal. | None |
+
+* **Timestamps:** Automatically generated `createdAt` and `updatedAt` fields.
+* **Database Indexes:**
+  * `{ owner: 1, targetEmail: 1 }` (Unique)
+  * `{ targetUser: 1, revealed: 1 }`
+
+</details>
+
+<details>
+<summary>🤝 5. Match Model Schema</summary>
+
+### Match Schema (`Match.js`)
+Stores details regarding a mutual swipe match between two students.
+
+| Field | Type | Description / Constraints | Default |
+| :--- | :--- | :--- | :--- |
+| `users` | `[ObjectId]` | References to the two matched [User](file:///d:/Nexora/backend/server/models/User.js) accounts. Required. | None |
+| `college` | `ObjectId` | Reference to [College](file:///d:/Nexora/backend/server/models/College.js). Required, Indexed. | None |
+| `revealLevel` | `Number` | Unlock level on progressive reveal scale (range: 1 - 5). | `2` |
+| `compatibility` | `Object` | Similarity profile matching indices calculated on swipe. | Details below |
+| `compatibility.score` | `Number` | Calculated profile matching score (range: 0 - 100). | `50` |
+| `compatibility.explanation`| `String` | AI-generated reasoning behind the calculated match. | None |
+| `active` | `Boolean` | Toggle for match cancellation (unmatching). | `true` |
+
+* **Timestamps:** Automatically generated `createdAt` and `updatedAt` fields.
+* **Database Indexes:**
+  * `{ 'users.0': 1, 'users.1': 1 }` (Unique)
+
+</details>
+
+<details>
+<summary>✉️ 6. Message Model Schema</summary>
+
+### Message Schema (`Message.js`)
+Represents an individual message dispatched inside direct chat matches or public rooms.
+
+| Field | Type | Description / Constraints | Default |
+| :--- | :--- | :--- | :--- |
+| `chat` | `ObjectId` | Reference to the parent [Chat](file:///d:/Nexora/backend/server/models/Chat.js). Required, Indexed. | None |
+| `sender` | `ObjectId` | Reference to [User](file:///d:/Nexora/backend/server/models/User.js) sender. Required. | None |
+| `body` | `String` | Text body of the message. Max length: 2000 chars. | `''` |
+| `media` | `[Object]` | Array of voice notes or image attachments. | `[]` |
+| `media[].url` | `String` | Cloudinary asset URL. | None |
+| `media[].type` | `String` | Enum: `['image', 'voice']`. | None |
+| `replyTo` | `ObjectId` | Reference to parent [Message](file:///d:/Nexora/backend/server/models/Message.js) if message is a reply. | None |
+| `reactions` | `[Object]` | List of emoji reactions attached to the message. | `[]` |
+| `reactions[].user` | `ObjectId` | Reference to reactor [User](file:///d:/Nexora/backend/server/models/User.js). | None |
+| `reactions[].emoji`| `String` | Unicode emoji. | None |
+| `readBy` | `[Object]` | Read-receipt tracking list. | `[]` |
+| `readBy[].user` | `ObjectId` | Reference to receiver [User](file:///d:/Nexora/backend/server/models/User.js). | None |
+| `readBy[].at` | `Date` | Timestamp of read action. | None |
+| `moderation` | `Object` | Automated safety classification results. | Details below |
+| `moderation.flagged` | `Boolean` | Flag indicating safety block trigger. | `false` |
+| `moderation.labels` | `[String]` | Policy violation category labels. | `[]` |
+| `moderation.score` | `Number` | Toxic classification probability score. | `0` |
+| `deletedAt` | `Date` | Soft delete indicator timestamp. | None |
+| `expiresAt` | `Date` | TTL timestamp index for disappearing messages (purged automatically). | None |
+
+* **Timestamps:** Automatically generated `createdAt` and `updatedAt` fields.
+* **Database Indexes:**
+  * `{ chat: 1, createdAt: -1 }`
+  * `{ expiresAt: 1 }` (TTL Index, deletes documents automatically at expiration)
+
+</details>
+
+<details>
+<summary>🔔 7. Notification Model Schema</summary>
+
+### Notification Schema (`Notification.js`)
+Stores system alerts and pushes directed to individual students.
+
+| Field | Type | Description / Constraints | Default |
+| :--- | :--- | :--- | :--- |
+| `user` | `ObjectId` | Reference to target [User](file:///d:/Nexora/backend/server/models/User.js). Required, Indexed. | None |
+| `type` | `String` | Required. Enum: `['match', 'message', 'like', 'crush_reveal', 'room_invite', 'premium_expiry', 'safety']`. | None |
+| `title` | `String` | Subject line header. | None |
+| `body` | `String` | Core message content text. | None |
+| `data` | `Mixed` | Payload details (chat IDs, profile metadata, routes). | None |
+| `readAt` | `Date` | Status read indicator timestamp. | None |
+
+* **Timestamps:** Automatically generated `createdAt` and `updatedAt` fields.
+* **Database Indexes:**
+  * `{ user: 1, readAt: 1, createdAt: -1 }`
+
+</details>
+
+<details>
+<summary>📡 8. RadarEvent Model Schema</summary>
+
+### RadarEvent Schema (`RadarEvent.js`)
+Tracks approximate location check-in logs for campus safety match alerts.
+
+| Field | Type | Description / Constraints | Default |
+| :--- | :--- | :--- | :--- |
+| `user` | `ObjectId` | Reference to check-in [User](file:///d:/Nexora/backend/server/models/User.js). Required. | None |
+| `college` | `ObjectId` | Reference to [College](file:///d:/Nexora/backend/server/models/College.js). Required, Indexed. | None |
+| `zone` | `String` | Required. Enum of campus zones. | None |
+| `happenedAt` | `Date` | Timestamp log of proximity alert. | `Date.now` |
+
+* **Timestamps:** Automatically generated `createdAt` and `updatedAt` fields.
+* **Database Indexes:**
+  * `{ college: 1, zone: 1, happenedAt: -1 }`
+  * `{ happenedAt: 1 }` (TTL index auto-expiring records after 14 days)
+
+</details>
+
+<details>
+<summary>🚨 9. Report Model Schema</summary>
+
+### Report Schema (`Report.js`)
+Handles moderation cases flags, tracking reported accounts and individual messages.
+
+| Field | Type | Description / Constraints | Default |
+| :--- | :--- | :--- | :--- |
+| `reporter` | `ObjectId` | Reference to initiating [User](file:///d:/Nexora/backend/server/models/User.js). Required. | None |
+| `targetUser` | `ObjectId` | Reference to reported [User](file:///d:/Nexora/backend/server/models/User.js). | None |
+| `message` | `ObjectId` | Reference to offending [Message](file:///d:/Nexora/backend/server/models/Message.js) context. | None |
+| `reason` | `String` | Policy violation category code. Required. | None |
+| `notes` | `String` | Written explanation notes from reporter. | None |
+| `status` | `String` | Enum: `['open', 'reviewing', 'resolved', 'dismissed']`. | `'open'` |
+| `actionTaken` | `String` | Description notes of administrative resolutions. | None |
+
+* **Timestamps:** Automatically generated `createdAt` and `updatedAt` fields.
+* **Database Indexes:**
+  * `{ status: 1, createdAt: -1 }`
+
+</details>
+
+<details>
+<summary>🏫 10. Room Model Schema</summary>
+
+### Room Schema (`Room.js`)
+Represents campus-wide themed public chatrooms.
+
+| Field | Type | Description / Constraints | Default |
+| :--- | :--- | :--- | :--- |
+| `name` | `String` | Required. Visible title of the room. | None |
+| `slug` | `String` | Required. Routing path indicator. | None |
+| `mood` | `String` | Required. Associated mood tag (e.g. `lonely`, `hackathon`). | None |
+| `college` | `ObjectId` | Reference to [College](file:///d:/Nexora/backend/server/models/College.js). Required, Indexed. | None |
+| `anonymous` | `Boolean` | Dictates if sender nicknames are hidden. | `true` |
+| `voiceEnabled` | `Boolean` | Toggle for audio/voice message permissions. | `true` |
+| `livePoll` | `Object` | Active interaction poll object. | Details below |
+| `livePoll.question` | `String` | Poll question. | None |
+| `livePoll.options` | `[Object]`| List of answer choices. | `[]` |
+| `livePoll.options[].label` | `String` | Answer text label. | None |
+| `livePoll.options[].votes` | `Number` | Tally total of votes received. | `0` |
+| `livePoll.closesAt` | `Date` | Poll expiration timestamp. | None |
+| `membersOnline` | `Number` | Counter for active connected socket connections. | `0` |
+| `active` | `Boolean` | Availability toggle for the room. | `true` |
+
+* **Timestamps:** Automatically generated `createdAt` and `updatedAt` fields.
+* **Database Indexes:**
+  * `{ college: 1, slug: 1 }` (Unique)
+
+</details>
+
+<details>
+<summary>💳 11. Subscription Model Schema</summary>
+
+### Subscription Schema (`Subscription.js`)
+Tracks Razorpay billing details, plans status, and subscription lifecycles.
+
+| Field | Type | Description / Constraints | Default |
+| :--- | :--- | :--- | :--- |
+| `user` | `ObjectId` | Reference to buyer [User](file:///d:/Nexora/backend/server/models/User.js). Required, Indexed. | None |
+| `plan` | `String` | Required. Enum: `['pulse_pro', 'orbit_z', 'nebula_x', 'spark', 'plus', 'max']`. | None |
+| `amount` | `Number` | Required. Purchase payment value. | None |
+| `currency` | `String` | Currency of purchase. | `'INR'` |
+| `razorpayOrderId` | `String` | Order transaction ID returned by Razorpay API. | None |
+| `razorpayPaymentId` | `String` | Payment signature verification reference. | None |
+| `status` | `String` | Enum: `['created', 'active', 'expired', 'failed']`. | `'created'` |
+| `startsAt` | `Date` | Subscription start timestamp. | None |
+| `expiresAt` | `Date` | Subscription expiry timestamp. | None |
+
+* **Timestamps:** Automatically generated `createdAt` and `updatedAt` fields.
+* **Database Indexes:**
+  * `{ status: 1, expiresAt: 1 }`
+
+</details>
+
+<details>
+<summary>👆 12. Swipe Model Schema</summary>
+
+### Swipe Schema (`Swipe.js`)
+Logs matching swipes deck actions executed by users.
+
+| Field | Type | Description / Constraints | Default |
+| :--- | :--- | :--- | :--- |
+| `from` | `ObjectId` | Reference to [User](file:///d:/Nexora/backend/server/models/User.js) who swiped. Required. | None |
+| `to` | `ObjectId` | Reference to [User](file:///d:/Nexora/backend/server/models/User.js) who was swiped on. Required. | None |
+| `college` | `ObjectId` | Reference to [College](file:///d:/Nexora/backend/server/models/College.js). Required, Indexed. | None |
+| `action` | `String` | Required. Enum: `['left', 'right', 'super_like']`. | None |
+| `rewound` | `Boolean` | Flag indicating if this action was reversed/undone. | `false` |
+
+* **Timestamps:** Automatically generated `createdAt` and `updatedAt` fields.
+* **Database Indexes:**
+  * `{ from: 1, to: 1 }` (Unique)
+  * `{ from: 1, action: 1, rewound: 1, createdAt: -1 }`
+  * `{ to: 1, action: 1 }`
+
+</details>
+
+---
+
 ## 🚦 REST API Endpoints
 
 ### 🔐 Authentication (`/api/auth`)
