@@ -121,7 +121,7 @@ export const AdminPage = () => {
     <div className="space-y-6 max-w-6xl mx-auto px-4 py-6">
       <div>
         <h1 className="text-4xl font-black font-display">Admin Command</h1>
-        <p className="mt-2 text-sm text-slate-500">Single-admin controls are locked to the ENV admin email.</p>
+        <p className="mt-2 text-sm text-slate-500">One dashboard. One decision maker in admin dashboard</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
