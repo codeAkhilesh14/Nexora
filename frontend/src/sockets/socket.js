@@ -1,6 +1,7 @@
 import { io } from 'socket.io-client';
 import { store } from '../app/store.js';
 import { pushNotification, setPresence, setPresenceSnapshot } from '../redux/realtimeSlice.js';
+import { logoutLocal } from '../features/auth/authSlice.js';
 
 let socket;
 
@@ -21,6 +22,10 @@ export const connectSocket = () => {
   socket.on('presence:snapshot', (payload) => store.dispatch(setPresenceSnapshot(payload)));
   socket.on('presence:update', (payload) => store.dispatch(setPresence(payload)));
   socket.on('notification:new', (payload) => store.dispatch(pushNotification(payload)));
+  socket.on('auth:revoked', () => {
+    store.dispatch(logoutLocal());
+    disconnectSocket();
+  });
   return socket;
 };
 

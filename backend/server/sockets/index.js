@@ -26,7 +26,7 @@ export const registerSockets = (io) => {
       if (!token) return next(new Error('Unauthorized'));
       const payload = jwt.verify(decodeURIComponent(token), env.jwtAccessSecret);
       const user = await User.findById(payload.sub);
-      if (!user) return next(new Error('Unauthorized'));
+      if (!user || user.status !== 'active') return next(new Error('Unauthorized'));
       socket.user = user;
       next();
     } catch (error) {

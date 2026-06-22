@@ -167,6 +167,7 @@ export const refresh = asyncHandler(async (req, res) => {
   }
   const user = await User.findById(payload.sub).populate('college');
   if (!user || payload.tokenVersion !== user.refreshTokenVersion) throw new ApiError(401, 'Refresh token expired');
+  if (user.status !== 'active') throw new ApiError(403, 'Account is not active');
   const tokens = setAuthCookies(res, user);
   ok(res, { user: publicUser(user), ...tokens }, 'Token refreshed');
 });

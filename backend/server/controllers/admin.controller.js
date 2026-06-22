@@ -26,7 +26,28 @@ export const upsertCollege = asyncHandler(async (req, res) => {
 });
 
 export const moderateUser = asyncHandler(async (req, res) => {
-  const user = await User.findByIdAndUpdate(req.params.userId, { status: req.body.status }, { new: true });
+  const { status } = req.body;
+  const user = await User.findById(req.params.userId);
+  if (!user) throw new ApiError(404, 'User not found');
+  
+  user.status = status;
+  if (status === 'suspended' || status === 'banned') {
+    user.refreshTokenVersion += 1;
+  }
+  await user.save();
+
+  const io = req.app.get('io');
+  if (io && (status === 'suspended' || status === 'banned')) {
+    io.to(`user:${user._id}`).emit('auth:revoked', { reason: 'status_changed' });
+    const sockets = io.sockets.adapter.rooms.get(`user:${user._id}`);
+    if (sockets) {
+      for (const socketId of sockets) {
+        const socket = io.sockets.sockets.get(socketId);
+        socket?.disconnect(true);
+      }
+    }
+  }
+
   ok(res, { user }, 'User status updated');
 });
 
