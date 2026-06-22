@@ -150,6 +150,83 @@ Nexora/
 
 ---
 
+# 🏗️ Core Tech Stack
+
+## 🎨 Frontend
+
+* **React (JSX)**
+* **Vite** — Build Tool & Bundler
+* **Redux Toolkit** — State Management
+* **TanStack React Query** — API Caching & Data Fetching
+* **React Router DOM** — Routing
+* **Framer Motion** — Animations
+* **Lucide React** — Icons
+* **Tailwind CSS** + **Vanilla CSS** — Styling
+
+## ⚙️ Backend
+
+* **Node.js** — Runtime
+* **Express.js** — REST API Framework
+* **Socket.IO** — Real-Time Communication
+
+## 🗄️ Database
+
+* **MongoDB Atlas** — Cloud Database
+* **Mongoose** — ODM for MongoDB
+
+## 🔐 Authentication & Security
+
+* **JWT (Access + Refresh Tokens)**
+* **HTTP-Only Secure Cookies**
+* **bcryptjs**
+* **Custom Validation Middleware**
+* **Rate Limiting & Security Middleware**
+
+## ⚡ Real-Time Features
+
+* **Real-Time Chat**
+* **Typing Indicators**
+* **Read Receipts**
+* **Online / Offline Status**
+* **Mood Rooms**
+* **Active Room Counters**
+* **Live Moderation Alerts**
+
+## ☁️ Cloud & Services
+
+### AI
+
+* **OpenRouter API**
+* **DeepSeek Chat**
+
+### Email
+
+* **Resend API**
+
+### Storage
+
+* **Cloudinary**
+
+### Payments
+
+* **Razorpay**
+
+## 🎨 UI & UX
+
+* **Dark / Light Themes**
+* **3D Swipe Cards**
+* **Animated Page Transitions**
+* **Progressive Reveal System**
+* **Responsive Mobile-First Design**
+
+## 📦 Deployment
+
+* **Render** (Backend)
+* **Render Static Site** (Frontend)
+* **MongoDB Atlas** (Database)
+  
+---
+
 ## 🚦 REST API Endpoints
 
 ### 🔐 Authentication (`/api/auth`)
