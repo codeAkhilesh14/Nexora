@@ -95,7 +95,6 @@ const ProfileCard = forwardRef(({ profile, online, onAction, actionPending, inde
   const userIsPremium = user?.premium?.active;
   const currentUserHasNebulaX = user?.premium?.active && ['nebula_x', 'max'].includes(user.premium.plan);
 
-  const tags = [...(profile.musicTaste || []), ...(profile.vibeTags || []), ...(profile.interests || [])].slice(0, 5);
   const gradient = cardGradients[index % cardGradients.length];
   const glow = glowColors[index % glowColors.length];
 
@@ -263,17 +262,61 @@ const ProfileCard = forwardRef(({ profile, online, onAction, actionPending, inde
           </div>
         </div>
 
-        {/* Tags */}
-        {tags.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-1.5">
-            {tags.map((tag) => (
-              <span
-                key={tag}
-                className="rounded-full bg-slate-100/60 dark:bg-white/[0.02] border border-slate-200/40 dark:border-white/[0.05] px-3 py-1 text-[11px] font-semibold text-slate-600 dark:text-white/45 hover:bg-slate-200/60 dark:hover:bg-white/[0.06] hover:border-slate-300/60 dark:hover:border-white/[0.08] hover:text-slate-800 dark:hover:text-white/80 transition-all duration-300 shadow-sm"
-              >
-                {tag}
-              </span>
-            ))}
+        {/* Bio */}
+        {profile.bio && (
+          <p className="mt-3.5 text-xs sm:text-sm text-slate-600 dark:text-white/70 leading-relaxed font-medium italic border-l-2 border-purple-500/30 pl-3">
+            "{profile.bio}"
+          </p>
+        )}
+
+        {/* Interests */}
+        {profile.interests && profile.interests.length > 0 && (
+          <div className="mt-4">
+            <h4 className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-white/30 mb-1.5">Interests</h4>
+            <div className="flex flex-wrap gap-1.5">
+              {profile.interests.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/10 dark:border-emerald-500/20 px-2.5 py-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-300 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/15 transition-colors duration-200"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Vibe Tags */}
+        {profile.vibeTags && profile.vibeTags.length > 0 && (
+          <div className="mt-3">
+            <h4 className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-white/30 mb-1.5">Vibe</h4>
+            <div className="flex flex-wrap gap-1.5">
+              {profile.vibeTags.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full bg-violet-500/5 dark:bg-violet-500/10 border border-violet-500/10 dark:border-violet-500/20 px-2.5 py-1 text-[10px] font-bold text-violet-600 dark:text-violet-300 hover:bg-violet-500/10 dark:hover:bg-violet-500/15 transition-colors duration-200"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Music Taste */}
+        {profile.musicTaste && profile.musicTaste.length > 0 && (
+          <div className="mt-3">
+            <h4 className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-white/30 mb-1.5">Music Taste</h4>
+            <div className="flex flex-wrap gap-1.5">
+              {profile.musicTaste.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full bg-pink-500/5 dark:bg-pink-500/10 border border-pink-500/10 dark:border-pink-500/20 px-2.5 py-1 text-[10px] font-bold text-pink-600 dark:text-pink-300 hover:bg-pink-500/10 dark:hover:bg-pink-500/15 transition-colors duration-200"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
           </div>
         )}
 

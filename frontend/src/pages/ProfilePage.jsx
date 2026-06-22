@@ -10,20 +10,7 @@ import { Card } from '../components/ui/Card.jsx';
 import { Input } from '../components/ui/Input.jsx';
 import { setCredentials } from '../features/auth/authSlice.js';
 
-const colleges = [
-  'Test College',
-  'JSS Academy of Technical Education Noida',
-  'Indian Institute of Technology Delhi',
-  'Delhi Technological University',
-  'Netaji Subhas University of Technology',
-  'Bennett University',
-  'Sharda University',
-  'Galgotias University',
-  'Amity University Noida',
-  'Indraprastha Institute of Information Technology Delhi',
-  'Guru Gobind Singh Indraprastha University',
-  'Birla Institute of Technology Mesra'
-];
+
 
 const fieldLabels = {
   collegeName: 'College name',
@@ -418,10 +405,12 @@ export const ProfilePage = () => {
               </label>
             </div>
           </div>
-          <Input placeholder="College Name *" list="profile-college-names" value={form.collegeName} onChange={(e) => setForm({ ...form, collegeName: e.target.value })} className="text-xs" />
-          <datalist id="profile-college-names">
-            {colleges.map((college) => <option key={college} value={college} />)}
-          </datalist>
+          <Input 
+            placeholder="College Name *" 
+            value={form.collegeName} 
+            className="text-xs bg-slate-100/50 dark:bg-white/[0.02] cursor-not-allowed opacity-85" 
+            disabled 
+          />
           <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
             <Input placeholder="nexorian nick name" value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })} className="text-xs" />
             <Input placeholder="Branch *" value={form.branch} onChange={(e) => setForm({ ...form, branch: e.target.value })} className="text-xs" />
