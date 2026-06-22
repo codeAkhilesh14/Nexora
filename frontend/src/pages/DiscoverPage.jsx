@@ -93,6 +93,7 @@ const ProfileCard = forwardRef(({ profile, online, onAction, actionPending, inde
   const { user } = useSelector((state) => state.auth);
   const profileOnline = Boolean(profile._id && online[profile._id]);
   const userIsPremium = user?.premium?.active;
+  const currentUserHasNebulaX = user?.premium?.active && ['nebula_x', 'max'].includes(user.premium.plan);
 
   const tags = [...(profile.musicTaste || []), ...(profile.vibeTags || []), ...(profile.interests || [])].slice(0, 5);
   const gradient = cardGradients[index % cardGradients.length];
@@ -211,12 +212,14 @@ const ProfileCard = forwardRef(({ profile, online, onAction, actionPending, inde
               </div>
             </div>
             {/* Online pulse */}
-            <span className={`absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full border-[2.5px] border-white dark:border-[#0f111a] transition-colors ${profileOnline
-                ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,.5)]'
-                : 'bg-slate-300 dark:bg-slate-600'
-              }`}>
-              {profileOnline && <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-40" />}
-            </span>
+            {currentUserHasNebulaX && (
+              <span className={`absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full border-[2.5px] border-white dark:border-[#0f111a] transition-colors ${profileOnline
+                  ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,.5)]'
+                  : 'bg-slate-300 dark:bg-slate-600'
+                }`}>
+                {profileOnline && <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-40" />}
+              </span>
+            )}
           </div>
 
           {/* Name & Meta */}
@@ -239,13 +242,15 @@ const ProfileCard = forwardRef(({ profile, online, onAction, actionPending, inde
               {profile.branch?.toUpperCase()}{userIsPremium && ` · Year ${profile.year}`}{profile.gender && (profile.gender === 'man' ? ' · M' : profile.gender === 'woman' ? ' · F' : '')}
             </p>
             <div className="mt-2 flex flex-wrap items-center gap-2">
-              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-[2px] text-[10px] font-bold ${profileOnline
-                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
-                  : 'bg-slate-100 dark:bg-white/[0.04] text-slate-500 dark:text-white/40 border border-slate-200/60 dark:border-white/[0.06]'
-                }`}>
-                <span className={`h-1.5 w-1.5 rounded-full ${profileOnline ? 'bg-emerald-400' : 'bg-slate-300 dark:bg-white/20'}`} />
-                {profileOnline ? 'Online' : 'Offline'}
-              </span>
+              {currentUserHasNebulaX && (
+                <span className={`inline-flex items-center gap-1 rounded-full px-2 py-[2px] text-[10px] font-bold ${profileOnline
+                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                    : 'bg-slate-100 dark:bg-white/[0.04] text-slate-500 dark:text-white/40 border border-slate-200/60 dark:border-white/[0.06]'
+                  }`}>
+                  <span className={`h-1.5 w-1.5 rounded-full ${profileOnline ? 'bg-emerald-400' : 'bg-slate-300 dark:bg-white/20'}`} />
+                  {profileOnline ? 'Online' : 'Offline'}
+                </span>
+              )}
               <span className="rounded-full bg-indigo-500/10 dark:bg-indigo-500/10 border border-indigo-500/20 dark:border-indigo-500/30 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-300">
                 L{profile.revealLevel}
               </span>

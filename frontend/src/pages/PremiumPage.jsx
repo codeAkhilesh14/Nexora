@@ -11,7 +11,7 @@ import { setCredentials } from '../features/auth/authSlice.js';
 const plans = [
   ['pulse_pro', '₹29', 'Pulse Pro', Zap, ['20 swipes daily', '120 messages daily', '120 messages daily in rooms', 'Premium badge', 'See users year']],
   ['orbit_z', '₹49', 'Orbit Z', Crown, ['30 swipes daily', 'Unlimited messages', 'Unlimited messages in rooms', 'Premium badge', 'See users year']],
-  ['nebula_x', '₹99', 'Nebula X', Rocket, ['Unlimited swipes', 'Unlimited messages', 'Unlimited messages in rooms', 'Stealth-ready badge', 'See users year', 'Unlock Super Likes']]
+  ['nebula_x', '₹99', 'Nebula X', Rocket, ['Unlimited swipes', 'Unlimited messages', 'Unlimited messages in rooms', 'Stealth-ready badge', 'See users year', 'Unlock Super Likes', 'See online/offline status']]
 ];
 
 const planIconColors = {
