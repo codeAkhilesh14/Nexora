@@ -3,6 +3,7 @@ import { Report } from '../models/Report.js';
 import { Subscription } from '../models/Subscription.js';
 import { User } from '../models/User.js';
 import { ok } from '../utils/ApiResponse.js';
+import { ApiError } from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
 export const dashboard = asyncHandler(async (_req, res) => {
@@ -33,3 +34,26 @@ export const reports = asyncHandler(async (_req, res) => {
   const data = await Report.find().populate('reporter targetUser', 'nickname email').sort({ createdAt: -1 }).limit(100);
   ok(res, { reports: data });
 });
+
+export const resolveReportStatus = asyncHandler(async (req, res) => {
+  const { reportId } = req.params;
+  const { status, actionTaken } = req.body;
+
+  if (!['resolved', 'dismissed'].includes(status)) {
+    throw new ApiError(400, 'Invalid status. Status must be resolved or dismissed.');
+  }
+
+  const report = await Report.findById(reportId);
+  if (!report) {
+    throw new ApiError(404, 'Report not found.');
+  }
+
+  report.status = status;
+  if (actionTaken !== undefined) {
+    report.actionTaken = actionTaken;
+  }
+  await report.save();
+
+  ok(res, { report }, `Report updated to ${status}`);
+});
+

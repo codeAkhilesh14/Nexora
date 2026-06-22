@@ -12,6 +12,7 @@ import { Card } from '../components/ui/Card.jsx';
 import { Input } from '../components/ui/Input.jsx';
 import { getSocket } from '../sockets/socket.js';
 import { getPremiumStyles } from './DiscoverPage.jsx';
+import { ReportModal } from '../components/ui/ReportModal.jsx';
 
 const profileImage = (profile) => profile?.realPhoto || profile?.avatar;
 
@@ -25,6 +26,7 @@ export const ChatsPage = () => {
   const [body, setBody] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [previewPhoto, setPreviewPhoto] = useState(null);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const containerRef = useRef(null);
   const popularEmojis = [
     '😀', '😂', '🤣', '😊', '😍', '😘', '😜', '😎',
@@ -293,17 +295,26 @@ export const ChatsPage = () => {
               </div>
             )}
             {currentPeer && (
-              <button
-                type="button"
-                onClick={() => blockToggle.mutate()}
-                disabled={blockToggle.isPending}
-                className={`text-[8px] sm:text-xs font-black uppercase tracking-wider px-1.5 py-0.5 sm:px-2.5 sm:py-1.5 rounded-lg border transition-all duration-200 shrink-0 ${isBlockedByMe
-                    ? 'bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500/20'
-                    : 'bg-slate-100 hover:bg-slate-200 border-black/5 text-slate-600 dark:bg-white/5 dark:hover:bg-white/10 dark:border-white/10 dark:text-slate-400 dark:hover:text-white'
-                  }`}
-              >
-                {isBlockedByMe ? 'Unblock' : 'Block'}
-              </button>
+              <div className="flex gap-1.5 sm:gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setIsReportModalOpen(true)}
+                  className="text-[8px] sm:text-xs font-black uppercase tracking-wider px-1.5 py-0.5 sm:px-2.5 sm:py-1.5 rounded-lg border transition-all duration-200 shrink-0 bg-rose-500/10 border-rose-500/20 text-rose-500 hover:bg-rose-500/20"
+                >
+                  Report
+                </button>
+                <button
+                  type="button"
+                  onClick={() => blockToggle.mutate()}
+                  disabled={blockToggle.isPending}
+                  className={`text-[8px] sm:text-xs font-black uppercase tracking-wider px-1.5 py-0.5 sm:px-2.5 sm:py-1.5 rounded-lg border transition-all duration-200 shrink-0 ${isBlockedByMe
+                      ? 'bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500/20'
+                      : 'bg-slate-100 hover:bg-slate-200 border-black/5 text-slate-600 dark:bg-white/5 dark:hover:bg-white/10 dark:border-white/10 dark:text-slate-400 dark:hover:text-white'
+                    }`}
+                >
+                  {isBlockedByMe ? 'Unblock' : 'Block'}
+                </button>
+              </div>
             )}
             <Timer className="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors cursor-pointer shrink-0" size={16} />
           </div>
@@ -428,6 +439,14 @@ export const ChatsPage = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Report Modal */}
+      <ReportModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        targetUserId={currentPeer?._id}
+        targetUserNickname={currentPeer?.nickname}
+      />
     </div>
   );
 };

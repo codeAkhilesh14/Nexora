@@ -21,6 +21,7 @@ import notificationRoutes from './routes/notification.routes.js';
 import profileRoutes from './routes/profile.routes.js';
 import roomRoutes from './routes/room.routes.js';
 import subscriptionRoutes from './routes/subscription.routes.js';
+import reportRoutes from './routes/report.routes.js';
 import { webhook as subscriptionWebhook } from './controllers/subscription.controller.js';
 import { registerSockets } from './sockets/index.js';
 import { syncCollegeCatalog } from './utils/collegeCatalog.js';
@@ -59,6 +60,7 @@ app.use('/api/rooms', roomRoutes);
 app.use('/api/crushes', crushRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/reports', reportRoutes);
 app.use('/api/admin', adminRoutes);
 
 registerSockets(io);
