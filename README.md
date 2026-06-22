@@ -194,18 +194,9 @@ Nexora/
 
 ## ☁️ Cloud & Services
 
-### AI
-
-* **OpenRouter API**
-* **DeepSeek Chat**
-
 ### Email
 
 * **Resend API**
-
-### Storage
-
-* **Cloudinary**
 
 ### Payments
 
