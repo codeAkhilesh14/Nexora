@@ -64,7 +64,22 @@ export const AdminPage = () => {
     }
   });
 
-  const isActionPending = dismissMutation.isPending || suspendMutation.isPending || banMutation.isPending;
+  const unsuspendMutation = useMutation({
+    mutationFn: async ({ targetUserId }) => {
+      if (!targetUserId) throw new Error('No target user to unsuspend.');
+      await http.patch(`/admin/users/${targetUserId}/status`, { status: 'active' });
+    },
+    onSuccess: () => {
+      toast.success('User status restored to active successfully');
+      qc.invalidateQueries({ queryKey: ['admin-reports'] });
+      qc.invalidateQueries({ queryKey: ['admin-dashboard'] });
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.message || err.message || 'Failed to unsuspend user');
+    }
+  });
+
+  const isActionPending = dismissMutation.isPending || suspendMutation.isPending || banMutation.isPending || unsuspendMutation.isPending;
 
   const items = [
     ['Users', stats.users, Users],
@@ -151,8 +166,13 @@ export const AdminPage = () => {
                         <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
                           Reporter: <span className="text-slate-500 font-medium">@{report.reporter?.nickname || 'Anonymous'} ({report.reporter?.email || 'N/A'})</span>
                         </p>
-                        <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                        <p className="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center flex-wrap gap-1.5">
                           Target User: <span className="text-rose-500 font-bold">@{report.targetUser?.nickname || 'Anonymous'} ({report.targetUser?.email || 'N/A'})</span>
+                          {report.targetUser?.status && report.targetUser.status !== 'active' && (
+                            <span className="text-[9px] uppercase font-black tracking-wider px-1.5 py-0.5 rounded-md bg-red-500/10 text-red-500 dark:text-red-400 animate-pulse shrink-0">
+                              {report.targetUser.status}
+                            </span>
+                          )}
                         </p>
                         <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
                           Reason: <span className="text-amber-600 dark:text-amber-400 capitalize">{report.reason?.replace(/_/g, ' ')}</span>
@@ -173,7 +193,7 @@ export const AdminPage = () => {
                       )}
                     </div>
 
-                    {!isResolved && (
+                    {!isResolved ? (
                       <div className="flex flex-row md:flex-col gap-2 shrink-0 self-end md:self-start">
                         <button
                           onClick={() => dismissMutation.mutate(report._id)}
@@ -198,6 +218,18 @@ export const AdminPage = () => {
                         >
                           Ban User
                         </button>
+                      </div>
+                    ) : (
+                      <div className="flex flex-row md:flex-col gap-2 shrink-0 self-end md:self-start">
+                        {['suspended', 'banned'].includes(report.targetUser?.status) && (
+                          <button
+                            onClick={() => unsuspendMutation.mutate({ targetUserId: report.targetUser?._id })}
+                            disabled={isActionPending}
+                            className="px-3.5 py-2 text-xs font-bold rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white shadow-md shadow-emerald-500/10 transition-colors"
+                          >
+                            Unsuspend User
+                          </button>
+                        )}
                       </div>
                     )}
                   </div>

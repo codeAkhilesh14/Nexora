@@ -52,7 +52,7 @@ export const moderateUser = asyncHandler(async (req, res) => {
 });
 
 export const reports = asyncHandler(async (_req, res) => {
-  const data = await Report.find().populate('reporter targetUser', 'nickname email').sort({ createdAt: -1 }).limit(100);
+  const data = await Report.find().populate('reporter targetUser', 'nickname email status').sort({ createdAt: -1 }).limit(100);
   ok(res, { reports: data });
 });
 
