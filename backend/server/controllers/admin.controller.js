@@ -75,6 +75,11 @@ export const resolveReportStatus = asyncHandler(async (req, res) => {
   }
   await report.save();
 
+  const io = req.app.get('io');
+  if (io) {
+    io.to('admins').emit('report:update', { reportId, status });
+  }
+
   ok(res, { report }, `Report updated to ${status}`);
 });
 

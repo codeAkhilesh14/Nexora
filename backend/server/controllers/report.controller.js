@@ -31,5 +31,10 @@ export const submitReport = asyncHandler(async (req, res) => {
     status: 'open'
   });
 
+  const io = req.app.get('io');
+  if (io) {
+    io.to('admins').emit('report:new', { reportId: report._id });
+  }
+
   ok(res, { report }, 'Report submitted successfully. Thank you for keeping campus safe!', 201);
 });

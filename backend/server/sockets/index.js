@@ -38,6 +38,9 @@ export const registerSockets = (io) => {
     const userId = socket.user._id.toString();
     onlineUsers.set(userId, (onlineUsers.get(userId) || 0) + 1);
     socket.join(`user:${userId}`);
+    if (socket.user.role === 'admin') {
+      socket.join('admins');
+    }
     await User.findByIdAndUpdate(userId, { lastSeenAt: new Date() });
     socket.emit('presence:snapshot', [...onlineUsers.keys()]);
     io.emit('presence:update', { userId, online: true });

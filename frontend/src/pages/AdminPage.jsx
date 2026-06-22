@@ -1,9 +1,11 @@
+import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Activity, BadgeIndianRupee, School, ShieldAlert, Users } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { http } from '../api/http.js';
 import { Card } from '../components/ui/Card.jsx';
 import { LoadingSpinner } from '../components/common/LoadingSpinner.jsx';
+import { getSocket } from '../sockets/socket.js';
 
 export const AdminPage = () => {
   const qc = useQueryClient();
@@ -19,6 +21,29 @@ export const AdminPage = () => {
     queryFn: () => http.get('/admin/reports') 
   });
   const reportsList = reportsData?.data?.reports || [];
+
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket) return;
+
+    const handleNewReport = () => {
+      toast('New safety report received!', { icon: '🔔' });
+      qc.invalidateQueries({ queryKey: ['admin-reports'] });
+      qc.invalidateQueries({ queryKey: ['admin-dashboard'] });
+    };
+
+    const handleReportUpdate = () => {
+      qc.invalidateQueries({ queryKey: ['admin-reports'] });
+      qc.invalidateQueries({ queryKey: ['admin-dashboard'] });
+    };
+
+    socket.on('report:new', handleNewReport);
+    socket.on('report:update', handleReportUpdate);
+    return () => {
+      socket.off('report:new', handleNewReport);
+      socket.off('report:update', handleReportUpdate);
+    };
+  }, [qc]);
 
   const dismissMutation = useMutation({
     mutationFn: (reportId) => http.patch(`/admin/reports/${reportId}/status`, { status: 'dismissed', actionTaken: 'Report dismissed by admin.' }),
