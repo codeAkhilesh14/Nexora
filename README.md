@@ -125,6 +125,13 @@ graph LR
 - **Premium Tiers:** Spark (Pulse Pro), Plus (Orbit Z), and Max (Nebula X) plans with dynamic limits on swipes/messages.
 - **Premium Badges:** Unlocks unique user status badges (Pulse Pro, Orbit Z, Nebula X) and custom gradient page themes.
 
+### 8. Campus Safety, Support & Legal Policies
+- **Contact Us:** Client support form that automatically detects the verified user email and routes messages directly to the admin dashboard database for rapid review.
+- **Privacy Policy:** Transparent disclosure detailing domain gating, secure bcrypt password hashing, automatic radar signal location purging (after 6 hours), and user data deletion requests.
+- **Terms & Conditions:** Platform rules enforcing campus student status, zero-tolerance policies on harassment/bullying, content ownership, and account termination criteria.
+- **Refund Policy:** General finality of subscription benefits upon activation, with case-by-case reviews for system/billing errors or duplicate charges.
+- **Community Guidelines & Safety:** Clear social codes covering respect, hate speech, spam prohibition, reporting guides, and safety instructions for offline interactions.
+
 ---
 
 ## 📂 Project Structure
