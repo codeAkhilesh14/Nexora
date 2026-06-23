@@ -19,8 +19,9 @@ export const hashToken = (token) => crypto.createHash('sha256').update(token).di
 
 export const cookieOptions = {
   httpOnly: true,
-  sameSite: 'lax',
+  sameSite: env.nodeEnv === 'production' ? 'none' : 'lax',
   secure: env.nodeEnv === 'production',
-  domain: env.cookieDomain,
+  domain: env.cookieDomain || undefined,
   path: '/'
 };
+
