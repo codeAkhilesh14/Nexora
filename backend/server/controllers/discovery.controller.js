@@ -185,6 +185,13 @@ export const getDeck = asyncHandler(async (req, res) => {
     ...u,
     matchPercentage: calculateMatchPercentage(req.user, u)
   }));
+
+  // Shuffle users randomly to show a different order every time discovery loads
+  for (let i = users.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [users[i], users[j]] = [users[j], users[i]];
+  }
+
   ok(res, { users });
 });
 
@@ -310,6 +317,13 @@ export const getRadarZoneUsers = asyncHandler(async (req, res) => {
     ...u,
     matchPercentage: calculateMatchPercentage(req.user, u)
   }));
+
+  // Shuffle users randomly to show a different order every time radar discovery loads
+  for (let i = users.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [users[i], users[j]] = [users[j], users[i]];
+  }
+
   ok(res, { users, zone, label: radarZoneLabels[zone] || zone.replace('_', ' ') });
 });
 

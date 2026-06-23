@@ -394,7 +394,8 @@ export const DiscoverPage = () => {
   const { data: deckData, isLoading: deckLoading } = useQuery({
     queryKey: deckQueryKey,
     queryFn: () => (showZoneDeck && selectedZone ? http.get(`/discovery/radar/users?zone=${selectedZone}`) : http.get('/discovery/deck')),
-    keepPreviousData: true
+    staleTime: 0,
+    gcTime: 0
   });
   const allUsers = deckData?.data?.users || [];
   const selectedZoneLabel = radarZones.find((zone) => zone.value === selectedZone)?.label || selectedZone;
