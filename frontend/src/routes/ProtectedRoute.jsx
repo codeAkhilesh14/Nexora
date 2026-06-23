@@ -2,7 +2,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { http } from '../api/http.js';
-import { logoutLocal, setCredentials } from '../features/auth/authSlice.js';
+import { logoutLocal, updateUser } from '../features/auth/authSlice.js';
 import { LoadingSpinner } from '../components/common/LoadingSpinner.jsx';
 
 export const ProtectedRoute = () => {
@@ -11,12 +11,15 @@ export const ProtectedRoute = () => {
   const [checking, setChecking] = useState(Boolean(token));
 
   useEffect(() => {
-    if (!token) return;
+    if (!token) {
+      setChecking(false);
+      return;
+    }
     let cancelled = false;
     http.get('/auth/me')
       .then((res) => {
         if (!cancelled) {
-          dispatch(setCredentials({ user: res.data.user, accessToken: token }));
+          dispatch(updateUser(res.data.user));
         }
       })
       .catch(() => {
@@ -27,8 +30,16 @@ export const ProtectedRoute = () => {
       .finally(() => {
         if (!cancelled) setChecking(false);
       });
-    return () => { cancelled = true; };
-  }, [token, dispatch]);
+    return () => {
+      cancelled = true;
+    };
+  }, []); // Run only once on mount to verify initial session state
+
+  useEffect(() => {
+    if (!token) {
+      setChecking(false);
+    }
+  }, [token]);
 
   if (checking) return <LoadingSpinner fullScreen />;
   return token ? <Outlet /> : <Navigate to="/auth/login" replace />;
