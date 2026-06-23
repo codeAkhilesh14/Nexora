@@ -99,8 +99,8 @@ export const ContactUsPage = () => {
                 </div>
                 <div>
                   <p className="text-xs font-black uppercase tracking-wider text-slate-400">Email Us</p>
-                  <a href="mailto:av14021999@gmail.com" className="text-sm font-bold text-purple-600 dark:text-purple-400 hover:underline">
-                    av14021999@gmail.com
+                  <a href="mailto:av384783@gmail.com" className="text-sm font-bold text-purple-600 dark:text-purple-400 hover:underline">
+                    av384783@gmail.com
                   </a>
                 </div>
               </div>

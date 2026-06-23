@@ -34,34 +34,20 @@ export const ChatsPage = () => {
     '🤔', '😭', '😡', '😱', '👀', '💡', '🚀', '💯',
     '🎓', '🏫', '📚', '☕', '🍕', '🍻', '👋', '🙏'
   ];
-  const { data, isLoading: chatsLoading, isFetching: chatsFetching } = useQuery({ queryKey: ['chats'], queryFn: () => http.get('/chats') });
+  const { data, isLoading: chatsLoading } = useQuery({
+    queryKey: ['chats'],
+    queryFn: () => http.get('/chats'),
+    staleTime: 0
+  });
   const chats = data?.data?.chats || [];
   const chatId = active?._id || chats[0]?._id;
-  const { data: messageData, isLoading: messagesLoading, isFetching: messagesFetching } = useQuery({ queryKey: ['messages', chatId], enabled: Boolean(chatId), queryFn: () => http.get(`/chats/${chatId}/messages`) });
+  const { data: messageData, isLoading: messagesLoading } = useQuery({
+    queryKey: ['messages', chatId],
+    enabled: Boolean(chatId),
+    queryFn: () => http.get(`/chats/${chatId}/messages`),
+    staleTime: 0
+  });
   const messages = messageData?.data?.messages || [];
-
-  const [isFirstLoad, setIsFirstLoad] = useState(true);
-  const [messagesFetchingForNewChat, setMessagesFetchingForNewChat] = useState(false);
-  const prevChatIdRef = useRef(chatId);
-
-  useEffect(() => {
-    if (!chatsLoading && !chatsFetching) {
-      setIsFirstLoad(false);
-    }
-  }, [chatsLoading, chatsFetching]);
-
-  useEffect(() => {
-    if (chatId && chatId !== prevChatIdRef.current) {
-      setMessagesFetchingForNewChat(true);
-      prevChatIdRef.current = chatId;
-    }
-  }, [chatId]);
-
-  useEffect(() => {
-    if (!messagesLoading && !messagesFetching) {
-      setMessagesFetchingForNewChat(false);
-    }
-  }, [messagesLoading, messagesFetching]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -149,8 +135,13 @@ export const ChatsPage = () => {
     if (!chatId) return;
     const socket = getSocket();
     socket?.emit('chat:join', chatId);
-    socket?.on('message:new', () => qc.invalidateQueries({ queryKey: ['messages', chatId] }));
-    return () => socket?.off('message:new');
+    const handleNewMessage = () => {
+      qc.invalidateQueries({ queryKey: ['messages', chatId] });
+    };
+    socket?.on('message:new', handleNewMessage);
+    return () => {
+      socket?.off('message:new', handleNewMessage);
+    };
   }, [chatId, qc]);
 
   useEffect(() => {
@@ -171,7 +162,7 @@ export const ChatsPage = () => {
     return 'Write softly, safely...';
   };
 
-  if (chatsLoading || isFirstLoad) {
+  if (chatsLoading) {
     return (
       <div className="flex items-center justify-center h-[calc(100vh-172px)] h-[calc(100dvh-172px)]">
         <LoadingSpinner fullScreen={false} />
@@ -321,7 +312,7 @@ export const ChatsPage = () => {
         </div>
 
         <div ref={containerRef} className="flex-1 space-y-3 overflow-y-auto p-4 bg-slate-50/50 dark:bg-ink/20 scroll-smooth">
-          {messagesLoading || messagesFetchingForNewChat ? (
+          {messagesLoading ? (
             <LoadingSpinner fullScreen={false} />
           ) : messages.map((m) => {
             const senderId = m.sender?._id || m.sender;

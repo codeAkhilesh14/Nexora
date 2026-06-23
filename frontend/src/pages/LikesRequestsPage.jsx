@@ -27,9 +27,10 @@ export const LikesRequestsPage = () => {
     dispatch(clearNotifications());
   }, [dispatch, qc]);
 
-  const { data, isLoading, isFetching } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['likeRequests'],
-    queryFn: () => http.get('/notifications/likes')
+    queryFn: () => http.get('/notifications/likes'),
+    staleTime: 0
   });
 
   const acceptMutation = useMutation({
@@ -83,7 +84,7 @@ export const LikesRequestsPage = () => {
         </div>
 
         <div className="space-y-4">
-          {isLoading || isFetching ? (
+          {isLoading ? (
             <LoadingSpinner fullScreen={false} />
           ) : requests.length === 0 ? (
             <Card>

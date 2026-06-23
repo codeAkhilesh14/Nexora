@@ -90,8 +90,8 @@ export const RefundPolicyPage = () => {
                 </p>
                 <div className="ml-7 mt-2 p-4 rounded-xl border border-black/5 bg-slate-50 dark:bg-white/5 inline-flex items-center gap-2 text-sm font-bold text-slate-850 dark:text-slate-200">
                   <Mail size={16} className="text-rose-500" />
-                  <a href="mailto:av14021999@gmail.com" className="hover:underline text-rose-600 dark:text-rose-400">
-                    av14021999@gmail.com
+                  <a href="mailto:av384783@gmail.com" className="hover:underline text-rose-600 dark:text-rose-400">
+                    av384783@gmail.com
                   </a>
                 </div>
               </section>
