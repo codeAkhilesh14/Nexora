@@ -2,6 +2,7 @@ import { College } from '../models/College.js';
 import { Report } from '../models/Report.js';
 import { Subscription } from '../models/Subscription.js';
 import { User } from '../models/User.js';
+import { SupportRequest } from '../models/SupportRequest.js';
 import { ok } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
@@ -81,5 +82,24 @@ export const resolveReportStatus = asyncHandler(async (req, res) => {
   }
 
   ok(res, { report }, `Report updated to ${status}`);
+});
+
+export const supportRequests = asyncHandler(async (_req, res) => {
+  const data = await SupportRequest.find().sort({ createdAt: -1 }).limit(100);
+  ok(res, { support: data });
+});
+
+export const resolveSupportStatus = asyncHandler(async (req, res) => {
+  const { supportId } = req.params;
+  const support = await SupportRequest.findById(supportId);
+  if (!support) throw new ApiError(404, 'Support request not found');
+  support.status = 'resolved';
+  await support.save();
+  
+  const io = req.app.get('io');
+  if (io) {
+    io.to('admins').emit('support:update', { supportId, status: 'resolved' });
+  }
+  ok(res, { support }, 'Support message marked as resolved');
 });
 

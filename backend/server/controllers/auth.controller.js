@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { College } from '../models/College.js';
 import { User } from '../models/User.js';
 import { Crush } from '../models/Crush.js';
+import { SupportRequest } from '../models/SupportRequest.js';
 import { sendOtpEmail, sendMail, sendResetPasswordOtpEmail } from '../services/email.service.js';
 import { ApiError } from '../utils/ApiError.js';
 import { ok } from '../utils/ApiResponse.js';
@@ -206,3 +207,16 @@ export const resetPassword = asyncHandler(async (req, res) => {
 });
 
 export const me = asyncHandler(async (req, res) => ok(res, { user: publicUser(req.user) }));
+
+export const contactUs = asyncHandler(async (req, res) => {
+  const { name, email, message } = req.body;
+  if (!name || !email || !message) {
+    throw new ApiError(400, 'Name, email and message are required');
+  }
+  const request = await SupportRequest.create({ name, email, message });
+  const io = req.app.get('io');
+  if (io) {
+    io.to('admins').emit('support:new', request);
+  }
+  ok(res, { request }, 'Support message submitted successfully');
+});

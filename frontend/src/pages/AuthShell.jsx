@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Logo } from '../components/common/Logo.jsx';
 
@@ -74,9 +75,23 @@ export const AuthShell = ({ children, title, subtitle }) => (
             <h2 className="text-3xl font-black font-display tracking-tight">{title}</h2>
             <p className="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">{subtitle}</p>
             {children}
+            <div className="mt-8 pt-4 border-t border-black/5 dark:border-white/5 flex flex-wrap justify-center gap-x-3 gap-y-1.5 text-[10px] font-semibold text-slate-400 dark:text-slate-500">
+              <Link to="/privacy" className="hover:text-purple-500 hover:underline transition-colors">Privacy</Link>
+              <span>•</span>
+              <Link to="/terms" className="hover:text-purple-500 hover:underline transition-colors">Terms</Link>
+              <span>•</span>
+              <Link to="/refund" className="hover:text-purple-500 hover:underline transition-colors">Refunds</Link>
+              <span>•</span>
+              <Link to="/contact" className="hover:text-purple-500 hover:underline transition-colors">Contact</Link>
+              <span>•</span>
+              <Link to="/guidelines" className="hover:text-purple-500 hover:underline transition-colors">Guidelines</Link>
+              <span>•</span>
+              <Link to="/safety" className="hover:text-purple-500 hover:underline transition-colors">Safety</Link>
+            </div>
           </motion.div>
         </section>
       </div>
     </motion.div>
   </div>
 );
+

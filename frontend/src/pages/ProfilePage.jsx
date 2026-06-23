@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { ImagePlus, Shuffle, Upload, UserRound, Crown, Zap, Sparkles, Calendar } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { http } from '../api/http.js';
 import { Button } from '../components/ui/Button.jsx';
@@ -429,6 +429,19 @@ export const ProfilePage = () => {
           <Button onClick={() => save.mutate()} className="w-full" disabled={save.isPending}>Save profile</Button>
         </div>
       </Card>
+      <div className="mt-8 mb-6 flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs text-slate-500 dark:text-slate-455 font-semibold">
+        <Link to="/privacy" className="hover:text-purple-500 hover:underline transition-colors">Privacy Policy</Link>
+        <span className="text-slate-300 dark:text-slate-700">•</span>
+        <Link to="/terms" className="hover:text-purple-500 hover:underline transition-colors">Terms & Conditions</Link>
+        <span className="text-slate-300 dark:text-slate-700">•</span>
+        <Link to="/refund" className="hover:text-purple-500 hover:underline transition-colors">Refund Policy</Link>
+        <span className="text-slate-300 dark:text-slate-700">•</span>
+        <Link to="/contact" className="hover:text-purple-500 hover:underline transition-colors">Contact Us</Link>
+        <span className="text-slate-300 dark:text-slate-700">•</span>
+        <Link to="/guidelines" className="hover:text-purple-500 hover:underline transition-colors">Guidelines</Link>
+        <span className="text-slate-300 dark:text-slate-700">•</span>
+        <Link to="/safety" className="hover:text-purple-500 hover:underline transition-colors">Safety</Link>
+      </div>
     </div>
   );
 };

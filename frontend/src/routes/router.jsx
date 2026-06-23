@@ -19,6 +19,13 @@ const ProfilePage = lazy(() => import('../pages/ProfilePage.jsx').then(module =>
 const LikesRequestsPage = lazy(() => import('../pages/LikesRequestsPage.jsx').then(module => ({ default: module.LikesRequestsPage })));
 const OnboardingPage = lazy(() => import('../pages/OnboardingPage.jsx').then(module => ({ default: module.OnboardingPage })));
 
+const PrivacyPolicyPage = lazy(() => import('../pages/PrivacyPolicyPage.jsx').then(module => ({ default: module.PrivacyPolicyPage })));
+const TermsConditionsPage = lazy(() => import('../pages/TermsConditionsPage.jsx').then(module => ({ default: module.TermsConditionsPage })));
+const RefundPolicyPage = lazy(() => import('../pages/RefundPolicyPage.jsx').then(module => ({ default: module.RefundPolicyPage })));
+const ContactUsPage = lazy(() => import('../pages/ContactUsPage.jsx').then(module => ({ default: module.ContactUsPage })));
+const CommunityGuidelinesPage = lazy(() => import('../pages/CommunityGuidelinesPage.jsx').then(module => ({ default: module.CommunityGuidelinesPage })));
+const SafetyReportingPage = lazy(() => import('../pages/SafetyReportingPage.jsx').then(module => ({ default: module.SafetyReportingPage })));
+
 const lazyLoad = (Component) => (
   <Suspense fallback={<LoadingSpinner fullScreen={true} />}>
     <Component />
@@ -30,6 +37,12 @@ export const router = createBrowserRouter([
   { path: '/auth/signup', element: lazyLoad(SignupPage) },
   { path: '/auth/verify-otp', element: lazyLoad(VerifyOtpPage) },
   { path: '/auth/forgot-password', element: lazyLoad(ForgotPasswordPage) },
+  { path: '/privacy', element: lazyLoad(PrivacyPolicyPage) },
+  { path: '/terms', element: lazyLoad(TermsConditionsPage) },
+  { path: '/refund', element: lazyLoad(RefundPolicyPage) },
+  { path: '/contact', element: lazyLoad(ContactUsPage) },
+  { path: '/guidelines', element: lazyLoad(CommunityGuidelinesPage) },
+  { path: '/safety', element: lazyLoad(SafetyReportingPage) },
   {
     element: <ProtectedRoute />,
     children: [

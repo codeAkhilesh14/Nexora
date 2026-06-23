@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { forgotPassword, login, logout, me, refresh, resendOtp, resetPassword, signup, verifyOtp } from '../controllers/auth.controller.js';
+import { forgotPassword, login, logout, me, refresh, resendOtp, resetPassword, signup, verifyOtp, contactUs } from '../controllers/auth.controller.js';
 import { requireAuth } from '../middleware/auth.middleware.js';
 import { validate } from '../middleware/validate.middleware.js';
 import { emailSchema, loginSchema, otpSchema, resetPasswordSchema, signupSchema } from '../validators/auth.validators.js';
@@ -16,4 +16,5 @@ router.post('/forgot-password', authLimiter, validate(emailSchema), forgotPasswo
 router.post('/reset-password', authLimiter, validate(resetPasswordSchema), resetPassword);
 router.post('/logout', requireAuth, logout);
 router.get('/me', requireAuth, me);
+router.post('/contact', contactUs);
 export default router;

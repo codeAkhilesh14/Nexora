@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Activity, BadgeIndianRupee, School, ShieldAlert, Users } from 'lucide-react';
+import { Activity, BadgeIndianRupee, School, ShieldAlert, Users, MessageSquare, CheckCircle2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { http } from '../api/http.js';
 import { Card } from '../components/ui/Card.jsx';
@@ -22,6 +22,12 @@ export const AdminPage = () => {
   });
   const reportsList = reportsData?.data?.reports || [];
 
+  const { data: supportData, isLoading: supportLoading } = useQuery({ 
+    queryKey: ['admin-support'], 
+    queryFn: () => http.get('/admin/support') 
+  });
+  const supportList = supportData?.data?.support || [];
+
   useEffect(() => {
     const socket = getSocket();
     if (!socket) return;
@@ -37,13 +43,40 @@ export const AdminPage = () => {
       qc.invalidateQueries({ queryKey: ['admin-dashboard'] });
     };
 
+    const handleNewSupport = () => {
+      toast('New support request received!', { icon: '✉️' });
+      qc.invalidateQueries({ queryKey: ['admin-support'] });
+      qc.invalidateQueries({ queryKey: ['admin-dashboard'] });
+    };
+
+    const handleSupportUpdate = () => {
+      qc.invalidateQueries({ queryKey: ['admin-support'] });
+      qc.invalidateQueries({ queryKey: ['admin-dashboard'] });
+    };
+
     socket.on('report:new', handleNewReport);
     socket.on('report:update', handleReportUpdate);
+    socket.on('support:new', handleNewSupport);
+    socket.on('support:update', handleSupportUpdate);
     return () => {
       socket.off('report:new', handleNewReport);
       socket.off('report:update', handleReportUpdate);
+      socket.off('support:new', handleNewSupport);
+      socket.off('support:update', handleSupportUpdate);
     };
   }, [qc]);
+
+  const resolveSupportMutation = useMutation({
+    mutationFn: (supportId) => http.patch(`/admin/support/${supportId}/resolve`),
+    onSuccess: () => {
+      toast.success('Support request marked as resolved');
+      qc.invalidateQueries({ queryKey: ['admin-support'] });
+      qc.invalidateQueries({ queryKey: ['admin-dashboard'] });
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.message || err.message || 'Failed to resolve support request');
+    }
+  });
 
   const dismissMutation = useMutation({
     mutationFn: (reportId) => http.patch(`/admin/reports/${reportId}/status`, { status: 'dismissed', actionTaken: 'Report dismissed by admin.' }),
@@ -255,6 +288,77 @@ export const AdminPage = () => {
                             Unsuspend User
                           </button>
                         )}
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Support Messages Panel */}
+      <div className="mt-12 space-y-4">
+        <h2 className="text-2xl font-black font-display flex items-center gap-2">
+          <MessageSquare className="text-purple-500" />
+          Campus Support & Contact Messages
+        </h2>
+        
+        {supportLoading ? (
+          <LoadingSpinner fullScreen={false} />
+        ) : supportList.length === 0 ? (
+          <Card className="p-8 text-center text-slate-500">
+            No support requests submitted yet.
+          </Card>
+        ) : (
+          <div className="space-y-4">
+            {supportList.map((req) => {
+              const isResolved = req.status === 'resolved';
+              return (
+                <Card 
+                  key={req._id} 
+                  className={`p-5 border transition-all duration-300 ${
+                    isResolved 
+                      ? 'border-slate-200/50 bg-slate-50/30 dark:border-slate-800/40 dark:bg-slate-900/10 opacity-70 shadow-none' 
+                      : 'border-purple-500/30 dark:border-purple-500/20 shadow-md shadow-purple-500/5'
+                  }`}
+                >
+                  <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                    <div className="space-y-2 flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`text-[10px] uppercase font-black tracking-wider px-2 py-0.5 rounded-full ${
+                          req.status === 'open' 
+                            ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400' 
+                            : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                        }`}>
+                          {req.status}
+                        </span>
+                        <span className="text-xs text-slate-400 dark:text-slate-500 font-semibold">
+                          Submitted on {new Date(req.createdAt).toLocaleDateString(undefined, { dateStyle: 'medium' })}
+                        </span>
+                      </div>
+                      
+                      <div className="space-y-1">
+                        <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                          From: <span className="text-slate-550 dark:text-slate-350 font-semibold">{req.name}</span> <span className="text-slate-450 text-xs">({req.email})</span>
+                        </p>
+                        <div className="p-3 bg-black/5 dark:bg-white/5 rounded-xl text-xs text-slate-600 dark:text-slate-400 whitespace-pre-wrap leading-relaxed mt-2 font-medium">
+                          {req.message}
+                        </div>
+                      </div>
+                    </div>
+
+                    {!isResolved && (
+                      <div className="flex shrink-0 self-end md:self-start">
+                        <button
+                          onClick={() => resolveSupportMutation.mutate(req._id)}
+                          disabled={resolveSupportMutation.isPending}
+                          className="px-3.5 py-2 text-xs font-bold rounded-xl bg-purple-600 hover:bg-purple-700 text-white shadow-md shadow-purple-500/10 transition-colors flex items-center gap-1.5"
+                        >
+                          <CheckCircle2 size={13} />
+                          Mark Resolved
+                        </button>
                       </div>
                     )}
                   </div>
