@@ -9,7 +9,7 @@ export const signAccessToken = (user) => jwt.sign(
 );
 
 export const signRefreshToken = (user, tokenVersion) => jwt.sign(
-  { sub: user._id.toString(), tokenVersion },
+  { sub: user._id.toString(), tokenVersion: tokenVersion ?? 0 },
   env.jwtRefreshSecret,
   { expiresIn: env.refreshTokenTtl }
 );

@@ -33,7 +33,7 @@ export const moderateUser = asyncHandler(async (req, res) => {
   
   user.status = status;
   if (status === 'suspended' || status === 'banned') {
-    user.refreshTokenVersion += 1;
+    user.refreshTokenVersion = (user.refreshTokenVersion ?? 0) + 1;
   }
   await user.save();
 

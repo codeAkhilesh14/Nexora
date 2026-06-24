@@ -167,7 +167,11 @@ export const refresh = asyncHandler(async (req, res) => {
     throw new ApiError(401, 'Refresh token invalid or expired');
   }
   const user = await User.findById(payload.sub).populate('college');
-  if (!user || payload.tokenVersion !== user.refreshTokenVersion) throw new ApiError(401, 'Refresh token expired');
+  
+  const tokenVersion = payload.tokenVersion !== undefined ? Number(payload.tokenVersion) : 0;
+  const userVersion = (user && user.refreshTokenVersion !== undefined) ? Number(user.refreshTokenVersion) : 0;
+  
+  if (!user || tokenVersion !== userVersion) throw new ApiError(401, 'Refresh token expired');
   if (user.status !== 'active') throw new ApiError(403, 'Account is not active');
   const tokens = setAuthCookies(res, user);
   ok(res, { user: publicUser(user), ...tokens }, 'Token refreshed');
@@ -175,7 +179,7 @@ export const refresh = asyncHandler(async (req, res) => {
 
 export const logout = asyncHandler(async (req, res) => {
   if (req.user) {
-    req.user.refreshTokenVersion += 1;
+    req.user.refreshTokenVersion = (req.user.refreshTokenVersion ?? 0) + 1;
     await req.user.save();
   }
   res.clearCookie('accessToken', cookieOptions);
@@ -201,7 +205,7 @@ export const resetPassword = asyncHandler(async (req, res) => {
   if (!user || user.resetPassword?.hash !== hashToken(otp) || user.resetPassword.expiresAt < new Date()) throw new ApiError(400, 'Invalid or expired OTP');
   user.password = password;
   user.resetPassword = undefined;
-  user.refreshTokenVersion += 1;
+  user.refreshTokenVersion = (user.refreshTokenVersion ?? 0) + 1;
   await user.save();
   ok(res, null, 'Password reset successful');
 });
