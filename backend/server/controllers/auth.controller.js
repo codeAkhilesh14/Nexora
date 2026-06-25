@@ -8,7 +8,7 @@ import { sendOtpEmail, sendMail, sendResetPasswordOtpEmail } from '../services/e
 import { ApiError } from '../utils/ApiError.js';
 import { ok } from '../utils/ApiResponse.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
-import { cookieOptions, createOtp, hashToken, signAccessToken, signRefreshToken } from '../utils/tokens.js';
+import { cookieOptions, createOtp, hashToken, signAccessToken, signRefreshToken, parseDurationToMs } from '../utils/tokens.js';
 import { env } from '../config/env.js';
 
 const requiredProfileFields = ['firstName', 'bio', 'branch', 'year', 'gender', 'interests', 'vibeTags', 'musicTaste'];
@@ -48,8 +48,8 @@ const publicUser = (user) => ({
 const setAuthCookies = (res, user) => {
   const accessToken = signAccessToken(user);
   const refreshToken = signRefreshToken(user, user.refreshTokenVersion);
-  res.cookie('accessToken', accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 });
-  res.cookie('refreshToken', refreshToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 });
+  res.cookie('accessToken', accessToken, { ...cookieOptions, maxAge: parseDurationToMs(env.accessTokenTtl, 15 * 60 * 1000) });
+  res.cookie('refreshToken', refreshToken, { ...cookieOptions, maxAge: parseDurationToMs(env.refreshTokenTtl, 7 * 24 * 60 * 60 * 1000) });
   return { accessToken };
 };
 
